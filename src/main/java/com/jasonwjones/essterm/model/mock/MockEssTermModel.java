@@ -30,5 +30,10 @@ public class MockEssTermModel implements EssTermModel {
 		}
 		return cubes;
 	}
+
+	@Override
+	public List<String> getRecentServers() {
+		return Arrays.asList("epm11124", "epm11123");
+	}
 		
 }

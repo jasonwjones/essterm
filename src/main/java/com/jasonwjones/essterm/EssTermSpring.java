@@ -1,5 +1,6 @@
 package com.jasonwjones.essterm;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +10,8 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.jasonwjones.essterm.model.EssTermModel;
 import com.jasonwjones.test.dialogs.ConnectionDialogWindow;
-import com.jasonwjones.test.dialogs.ConnectionDialogWindow.ConnectionWindowDataSource;
+import com.jasonwjones.test.dialogs.ConnectionDialogWindow.ConnectionDialogModel;
+//import com.jasonwjones.test.dialogs.ConnectionDialogWindow.ConnectionWindowDataSource;
 import com.jasonwjones.test.dialogs.LauncherWindow;
 import com.jasonwjones.test.dialogs.LauncherWindow.LauncherWindowDelegate;
 import com.jasonwjones.test.models.ChosenConnection;
@@ -49,7 +51,8 @@ public class EssTermSpring implements LauncherWindowDelegate {
 	@Override
 	public void chooseConnection() {
 		ConnectionDialogWindow cdw = new ConnectionDialogWindow("Conn");
-		cdw.setDataSource(new ConnectionWindowDataSourceAdapter(essTerm));
+		cdw.setModel(new ConnectionDialogModelAdapter());
+		//cdw.setDataSource(new ConnectionWindowDataSourceAdapter(essTerm));
 		ChosenConnection conn = cdw.showDialog(gui);
 		
 //		System.out.println("Conn: " + conn);
@@ -64,25 +67,33 @@ public class EssTermSpring implements LauncherWindowDelegate {
 		
 	}
 	
-	private static class ConnectionWindowDataSourceAdapter implements ConnectionWindowDataSource {
+	private class ConnectionDialogModelAdapter implements ConnectionDialogModel {
 
-		private EssTermModel essTermModel;
-		
-		public ConnectionWindowDataSourceAdapter(EssTermModel model) {
-			this.essTermModel = model;
+		@Override
+		public String getServer() {
+			return "epm11124";
+		}
+
+		@Override
+		public void setServer(String server) {
+			// TODO Auto-generated method stub
+			
 		}
 		
+		public List<String> getRecentServers() {
+			return Arrays.asList("epm11124", "epm11123");
+		}
+
 		@Override
 		public List<String> getApplications(String server, String username, String password) {
-			return essTermModel.getApplications(server, username, password);
+			return Arrays.asList("Sample", "ASOSamp");
 		}
 
 		@Override
-		public List<String> getCubes(String server, String username, String password, String application) {
-			return essTermModel.getCubes(server, username, password, application);
+		public List<String> getCubes(String application) {
+			return Arrays.asList("Basic", "Basic2");
 		}
 		
-	}
-	
+	}	
 	
 }

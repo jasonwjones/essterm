@@ -26,8 +26,6 @@ public class ConnectionDialogWindow extends DialogWindow {
 	
 	private TextBox passwordTextBox;
 	
-	private String server;
-	
 	private RadioBoxList<String> applicationsListBox;
 	
 	private RadioBoxList<String> cubesListBox;
@@ -36,16 +34,14 @@ public class ConnectionDialogWindow extends DialogWindow {
 	
 	private ConnectionDialogModel model;
 	
-	private ConnectionWindowDataSource dataSource;
-	
-	public void setDataSource(ConnectionWindowDataSource dataSource) {
-		this.dataSource = dataSource;
+	public void setModel(ConnectionDialogModel model) {
+		this.model = model;
 	}
 	
 	public ConnectionDialogWindow(String title) {
 		super(title);
 		
-		model = new ConnectionDialogModel();
+		//model = new ConnectionDialogModel();
 		setCloseWindowWithEscape(true);
 		
 		serverComboBox = new ComboBox<String>("Item 1", "item 2");
@@ -60,16 +56,11 @@ public class ConnectionDialogWindow extends DialogWindow {
 				
 				applicationsListBox.clearItems();
 				applicationsListBox.clearSelection();
-				for (String application : dataSource.getApplications(model.getServer(), "admin", "password")) {
+				for (String application : model.getApplications(model.getServer(), "admin", "password")) {
 					applicationsListBox.addItem(application);
-				}
-				
-				
+				}	
 			}});
-		
-		//GridLayout gridLayout = new GridLayout(2);
-		//gridLayout.setVerticalSpacing(1);
-		
+				
 		usernameTextBox = new TextBox();
 		passwordTextBox = new TextBox();
 
@@ -80,8 +71,16 @@ public class ConnectionDialogWindow extends DialogWindow {
 		Panel rightPanel = new Panel();
 		
 		cubesListBox = new RadioBoxList<String>(new TerminalSize(20, 5));
-//		cubes.addItem("Cube 1");
-//		cubes.addItem("Cube 2");
+		cubesListBox.addListener(new Listener() {
+			@Override
+			public void onSelectionChanged(int selectedIndex, int previousSelection) {
+				System.out.println("Selected cube: " + cubesListBox.getCheckedItem());
+				String cubeName = cubesListBox.getCheckedItem();
+				if (cubeName != null) {
+					close();
+				}
+				
+			}});
 		
 		rightPanel.addComponent(cubesListBox.withBorder(Borders.singleLine("Cubes")));
 		
@@ -94,7 +93,8 @@ public class ConnectionDialogWindow extends DialogWindow {
 				String application = applicationsListBox.getSelectedItem();
 				
 				cubesListBox.clearItems();
-				for (String cube : dataSource.getCubes("sever", "username", "password", application)) {
+				
+				for (String cube : model.getCubes("app")) {
 					cubesListBox.addItem(cube);
 				};
 				cubesListBox.takeFocus();
@@ -138,11 +138,14 @@ public class ConnectionDialogWindow extends DialogWindow {
 
     @Override
     public ChosenConnection showDialog(WindowBasedTextGUI textGUI) {
-        //selectedFile = null;
         super.showDialog(textGUI);
         return new ChosenConnection();
     }
 	
+    public ChosenConnection getChosenConnection() {
+    	return null;
+    }
+    
 //	public static void main(String[] args) throws Exception {
 //	    // Setup terminal and screen layers
 //	    Terminal terminal = new DefaultTerminalFactory().createTerminal();
@@ -160,39 +163,36 @@ public class ConnectionDialogWindow extends DialogWindow {
 //	    
 //	}
 	
-    public interface ConnectionWindowDataSource {
-    	
-    	public List<String> getApplications(String server, String username, String password);
-    	
-    	public List<String> getCubes(String server, String username, String password, String application);
-    	
-    }
+//    public interface ConnectionWindowDataSource {
+//    	
+//    	public List<String> getApplications(String server, String username, String password);
+//    	
+//    	public List<String> getCubes(String server, String username, String password, String application);
+//    	
+//    }
     
-	public static interface ConnectionDialogWindowDelegate {
+//	public static interface ConnectionDialogWindowDelegate {
+//		
+//		//spublic void connect(String server, String username, String password);
+//		
+//		public List<String> getApplications(String server, String username, String password);
+//		
+//		public List<String> getCubes(String application);
+//		
+//		public void choseCube(String server, String username, String password, String application, String cube);
+//		
+//	}
+	
+	public static interface ConnectionDialogModel {
 		
-		//spublic void connect(String server, String username, String password);
+		public String getServer();
+		
+		public void setServer(String server);
 		
 		public List<String> getApplications(String server, String username, String password);
 		
 		public List<String> getCubes(String application);
-		
-		public void choseCube(String server, String username, String password, String application, String cube);
-		
-	}
-	
-	public static class ConnectionDialogModel {
-		
-		private String server;
 
-		public String getServer() {
-			return server;
-		}
-
-		public void setServer(String server) {
-			this.server = server;
-			System.out.println("Model server is now: " + server);
-		}
-		
 	}
 	
 }

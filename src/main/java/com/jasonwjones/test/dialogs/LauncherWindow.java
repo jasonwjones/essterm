@@ -1,7 +1,5 @@
 package com.jasonwjones.test.dialogs;
 
-import org.springframework.stereotype.Component;
-
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.BasicWindow;
 import com.googlecode.lanterna.gui2.Button;
