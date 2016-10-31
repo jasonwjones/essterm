@@ -2,6 +2,7 @@ package com.jasonwjones.test.dialogs.adhocoptions;
 
 import com.googlecode.lanterna.gui2.Borders;
 import com.googlecode.lanterna.gui2.CheckBoxList;
+import com.googlecode.lanterna.gui2.CheckBoxList.Listener;
 import com.googlecode.lanterna.gui2.GridLayout;
 import com.googlecode.lanterna.gui2.Label;
 import com.googlecode.lanterna.gui2.LinearLayout;
@@ -9,12 +10,16 @@ import com.googlecode.lanterna.gui2.LinearLayout.Alignment;
 import com.googlecode.lanterna.gui2.Panel;
 import com.googlecode.lanterna.gui2.RadioBoxList;
 import com.googlecode.lanterna.gui2.TextBox;
+import com.jasonwjones.essterm.grid.AdhocOptions;
 
 public class DisplayOptionsPanel extends Panel {
 
-	public DisplayOptionsPanel() {
+	private AdhocOptions options;
+	
+	public DisplayOptionsPanel(AdhocOptions options) {
 		super();
 		
+		this.options = options;
 		//setLayoutData();
 		//setLayoutData(GridLayout.createHorizontallyFilledLayoutData(1));
 		
@@ -43,10 +48,16 @@ public class DisplayOptionsPanel extends Panel {
 		addComponent(replacement.withBorder(Borders.singleLine("Replacement")));
 		
 		CheckBoxList<String> aliases = new CheckBoxList<String>();
-		aliases.addItem("Use Aliases");
+		aliases.addItem("Use Aliases", options.isUseAliases());
 		aliases.addItem("Use Both Member Names and Aliases for row dimensions");
+		aliases.addListener(new Listener() {
+			@Override
+			public void onStatusChanged(int itemIndex, boolean checked) {
+				if (itemIndex == 0) {
+					options.setUseAliases(checked);
+				}
+			}});
 		addComponent(aliases.withBorder(Borders.singleLine("Suppress")));
-		
 		
 	}
 	

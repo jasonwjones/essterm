@@ -49,7 +49,9 @@ public class ConnectionDialogWindow extends DialogWindow {
 		this.model = model;
 
 		serverComboBox.clearItems();
-		serverComboBox.addItem(model.getRecentServer());
+		if (model.getRecentServer() != null) {
+			serverComboBox.addItem(model.getRecentServer());
+		}
 		for (String recentServer : model.getRecentServers()) {
 			serverComboBox.addItem(recentServer);
 		}
@@ -79,7 +81,6 @@ public class ConnectionDialogWindow extends DialogWindow {
 
 		loginButton = new Button("Login", new Runnable() {
 			public void run() {
-				//System.out.println("Let's login");
 				try {
 					value.setServer(serverComboBox.getText());
 					value.setUsername(usernameTextBox.getText());
@@ -178,7 +179,7 @@ public class ConnectionDialogWindow extends DialogWindow {
 	private void refreshApplications() throws EssException {
 		applicationsListBox.clearItems();
 
-		for (String application : essbaseResolver.getApplications(model.getRecentServer(), value.getUsername(), value.getPassword())) {
+		for (String application : essbaseResolver.getApplications(value.getServer(), value.getUsername(), value.getPassword())) {
 			applicationsListBox.addItem(application, new ApplicationRunnable(application));
 		}
 	}

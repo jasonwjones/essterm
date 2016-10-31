@@ -49,8 +49,9 @@ public class LauncherWindow extends BasicWindow {
 		
 		panel.addComponent(new Button("Ad hoc Options", new Runnable() {
 			public void run() {
-				AdhocOptionsDialogWindow aodw = new AdhocOptionsDialogWindow("Opts");
-				getTextGUI().addWindowAndWait(aodw);
+				delegate.editAdhocOptions();
+//				AdhocOptionsDialogWindow aodw = new AdhocOptionsDialogWindow();
+//				getTextGUI().addWindowAndWait(aodw);
 			}
 		}));
 		
@@ -82,6 +83,8 @@ public class LauncherWindow extends BasicWindow {
 		public void chooseConnection();
 		
 		public void startAdhocGrid();
+		
+		public void editAdhocOptions();
 		
 	}
 

@@ -1,6 +1,7 @@
 package com.jasonwjones.test.dialogs;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,7 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 	
 	public AdhocGridWindow(String title, EssGrid gridData) {
 		super(title);
-		//this.setHints(Arrays.asList(Hint.EXPANDED));
+		this.setHints(Arrays.asList(Hint.EXPANDED));
 		this.gridData = gridData;
 		setCloseWindowWithEscape(true);
 		panel = new Panel();
@@ -48,7 +49,7 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 		grid = new EssTable<String>("Dummy");
 		grid.setKeyStrokeDelegate(this);
 		
-		grid.setVisibleColumns(3);
+		grid.setVisibleColumns(4);
 		
 		panel.addComponent(new Label("Hi there"));
 		panel.addComponent(grid);
@@ -95,6 +96,13 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 		});
 		
 		keyBindings.put(new KeyStroke('p', false, false), new GridAction() {
+			@Override
+			public void execute(Point point, EssGrid dataSource) {
+				buildCellDialog().showDialog(getTextGUI());
+			}
+		});
+		
+		keyBindings.put(new KeyStroke(',', false, false), new GridAction() {
 			@Override
 			public void execute(Point point, EssGrid dataSource) {
 				buildCellDialog().showDialog(getTextGUI());

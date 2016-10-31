@@ -4,9 +4,9 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.ActionListBox;
 import com.googlecode.lanterna.gui2.Borders;
 import com.googlecode.lanterna.gui2.GridLayout;
-import com.googlecode.lanterna.gui2.Label;
 import com.googlecode.lanterna.gui2.Panel;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
+import com.jasonwjones.essterm.grid.AdhocOptions;
 import com.jasonwjones.test.dialogs.adhocoptions.DisplayOptionsPanel;
 import com.jasonwjones.test.dialogs.adhocoptions.GeneralOptionsPanel;
 import com.jasonwjones.test.dialogs.adhocoptions.ZoomOptionsPanel;
@@ -21,12 +21,18 @@ public class AdhocOptionsDialogWindow extends DialogWindow {
 	
 	private Panel rightContainer;
 	
+	public AdhocOptions value;
+	
 	public AdhocOptionsDialogWindow() {
-		this("Ad hoc Options");
+		this(new AdhocOptions());
 	}
 	
-	public AdhocOptionsDialogWindow(String title) {
-		super(title);
+	public AdhocOptions getValue() {
+		return value;
+	}
+	
+	public AdhocOptionsDialogWindow(AdhocOptions value) {
+		super("Ad hoc Options");
 
 		setCloseWindowWithEscape(true);
 		
@@ -61,7 +67,7 @@ public class AdhocOptionsDialogWindow extends DialogWindow {
 		
 		
 		//this.generalOptions = new Panel();
-		this.displayOptions = new DisplayOptionsPanel();
+		this.displayOptions = new DisplayOptionsPanel(value);
 		//this.generalOptions.addComponent(new Label("First thing on general options)"));
 		
 		this.zoomOptions = new ZoomOptionsPanel();

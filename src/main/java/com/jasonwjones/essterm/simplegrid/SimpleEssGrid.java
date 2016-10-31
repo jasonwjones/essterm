@@ -3,13 +3,12 @@ package com.jasonwjones.essterm.simplegrid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jasonwjones.essterm.grid.AdhocOptions;
 import com.jasonwjones.essterm.grid.EssCell;
 import com.jasonwjones.essterm.grid.EssGrid;
 import com.jasonwjones.essterm.grid.Point;
 import com.jasonwjones.griddly.Grid;
-import com.jasonwjones.griddly.GridShaper;
 import com.jasonwjones.griddly.impl.BasicGrid;
-import com.jasonwjones.griddly.shapers.DefaultGridShaper;
 
 class SimpleEssGrid implements EssGrid {
 
@@ -65,6 +64,11 @@ class SimpleEssGrid implements EssGrid {
 	@Override
 	public Grid<EssCell> getGrid() {
 		return grid;
+	}
+
+	@Override
+	public void updateCubeViewProperties(AdhocOptions adhocOptions) throws Exception {
+		throw new RuntimeException("Not supported");
 	}
 
 }

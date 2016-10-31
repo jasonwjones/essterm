@@ -18,8 +18,16 @@ public class AdhocOptions {
 	
 	private String noAccessLabel;
 	
-	private boolean useAliases;
+	private boolean useAliases = true;
 	
 	private boolean useBothMemberNameAndAlias;
+
+	public boolean isUseAliases() {
+		return useAliases;
+	}
+
+	public void setUseAliases(boolean useAliases) {
+		this.useAliases = useAliases;
+	}
 	
 }

@@ -23,4 +23,6 @@ public interface EssGrid {
 	
 	public Grid<EssCell> getGrid();
 		
+	public void updateCubeViewProperties(AdhocOptions adhocOptions) throws Exception;
+	
 }

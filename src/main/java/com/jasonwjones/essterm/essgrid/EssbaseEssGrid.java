@@ -19,6 +19,7 @@ import com.essbase.api.dataquery.IEssOpZoomIn;
 import com.essbase.api.dataquery.IEssOpZoomOut;
 import com.essbase.api.datasource.IEssCube;
 import com.essbase.api.datasource.IEssOlapFileObject;
+import com.jasonwjones.essterm.grid.AdhocOptions;
 import com.jasonwjones.essterm.grid.EssCell;
 import com.jasonwjones.essterm.grid.EssGrid;
 import com.jasonwjones.essterm.grid.EssGridException;
@@ -37,6 +38,11 @@ class EssbaseEssGrid implements EssGrid {
 	private IEssCubeView cubeView;
 
 	public static final EssCell MISSING = new MissingCell(); 
+	
+	public void updateCubeViewProperties(AdhocOptions adhocOptions) throws Exception {
+		cubeView.setAliasNames(adhocOptions.isUseAliases());
+		cubeView.updatePropertyValues();
+	}
 	
 	public EssbaseEssGrid(IEssCube cube) throws EssGridException {
 		this.cube = cube;

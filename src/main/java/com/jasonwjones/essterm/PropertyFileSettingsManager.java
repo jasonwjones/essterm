@@ -14,6 +14,8 @@ import java.util.TreeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.jasonwjones.essterm.grid.AdhocOptions;
+
 public class PropertyFileSettingsManager implements SettingsManager {
 
 	private static final Logger logger = LoggerFactory.getLogger(PropertyFileSettingsManager.class);
@@ -26,12 +28,14 @@ public class PropertyFileSettingsManager implements SettingsManager {
 	
 	private File settingsFile;
 	
+	private AdhocOptions adhocOptions;
+	
 	public PropertyFileSettingsManager(File settingsFile) {
 		try {
 			this.settingsFile = settingsFile;
 			initSettings();
 			loadSettings(settingsFile);
-			 
+			 adhocOptions = new AdhocOptions();
 		} catch (IOException e) {
 			logger.warn("No settings file found at {}, using defaults", settingsFile);
 		}
@@ -114,6 +118,11 @@ public class PropertyFileSettingsManager implements SettingsManager {
 		} else {
 			return null;
 		}
+	}
+
+	@Override
+	public AdhocOptions getAdhocOptions() {
+		return adhocOptions;
 	}
 
 }
