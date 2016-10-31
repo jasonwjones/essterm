@@ -1,4 +1,4 @@
-package com.jasonwjones.test.dialogs;
+package com.jasonwjones.essterm.dialogs;
 
 import com.googlecode.lanterna.gui2.dialogs.ActionListDialog;
 import com.googlecode.lanterna.gui2.dialogs.ActionListDialogBuilder;

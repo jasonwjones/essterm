@@ -1,10 +1,10 @@
-package com.jasonwjones.test.dialogs;
+package com.jasonwjones.essterm.dialogs;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.BasicWindow;
 import com.googlecode.lanterna.gui2.Button;
 import com.googlecode.lanterna.gui2.Panel;
-import com.jasonwjones.test.dialogs.MemberSelectionWindow.MemberSelectionWindowDelegate;
+import com.jasonwjones.essterm.dialogs.MemberSelectionWindow.MemberSelectionWindowDelegate;
 
 public class LauncherWindow extends BasicWindow {
 

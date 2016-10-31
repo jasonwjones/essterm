@@ -1,4 +1,4 @@
-package com.jasonwjones.test.dialogs.adhocoptions;
+package com.jasonwjones.essterm.dialogs.adhocoptions;
 
 import com.googlecode.lanterna.gui2.Borders;
 import com.googlecode.lanterna.gui2.LinearLayout;

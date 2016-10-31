@@ -1,4 +1,4 @@
-package com.jasonwjones.test;
+package com.jasonwjones.essterm;
 
 import java.util.Arrays;
 import java.util.List;

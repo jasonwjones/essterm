@@ -1,4 +1,4 @@
-package com.jasonwjones.test.dialogs;
+package com.jasonwjones.essterm.dialogs;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,10 +18,10 @@ import com.googlecode.lanterna.gui2.dialogs.ActionListDialogBuilder;
 import com.googlecode.lanterna.gui2.table.TableModel;
 import com.googlecode.lanterna.input.KeyStroke;
 import com.googlecode.lanterna.input.KeyType;
+import com.jasonwjones.essterm.EssTable;
+import com.jasonwjones.essterm.EssTable.KeyStrokeDelegate;
 import com.jasonwjones.essterm.grid.EssGrid;
 import com.jasonwjones.essterm.grid.Point;
-import com.jasonwjones.test.EssTable;
-import com.jasonwjones.test.EssTable.KeyStrokeDelegate;
 
 public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 

@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import com.jasonwjones.test.models.ChosenConnection;
+import com.jasonwjones.essterm.model.ChosenConnection;
 
 @Component
 public class ConnectionManager {

@@ -1,4 +1,4 @@
-package com.jasonwjones.test.dialogs;
+package com.jasonwjones.essterm.dialogs;
 
 // TODO: a two column table that scrolls, showing the action, then a cell with the
 // current mapped key

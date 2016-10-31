@@ -1,6 +1,6 @@
 package com.jasonwjones.essterm.grid;
 
-import com.jasonwjones.test.models.ChosenConnection;
+import com.jasonwjones.essterm.model.ChosenConnection;
 
 public interface EssGridFactory {
 

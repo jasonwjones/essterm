@@ -1,6 +1,6 @@
-package com.jasonwjones.test.controllers;
+package com.jasonwjones.essterm;
 
-import com.jasonwjones.test.models.ConnectionModel;
+import com.jasonwjones.essterm.model.ConnectionModel;
 
 public class EssLauncher {
 

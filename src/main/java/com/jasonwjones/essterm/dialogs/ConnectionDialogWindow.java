@@ -1,4 +1,4 @@
-package com.jasonwjones.test.dialogs;
+package com.jasonwjones.essterm.dialogs;
 
 import java.util.Set;
 
@@ -21,7 +21,7 @@ import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.jasonwjones.essterm.EssStringUtils;
 import com.jasonwjones.essterm.essbase.EssbaseConnectionResolver;
-import com.jasonwjones.test.models.ChosenConnection;
+import com.jasonwjones.essterm.model.ChosenConnection;
 
 public class ConnectionDialogWindow extends DialogWindow {
 
@@ -39,14 +39,11 @@ public class ConnectionDialogWindow extends DialogWindow {
 
 	private Button loginButton;
 
-	private ConnectionDialogModel model;
-
 	private EssbaseConnectionResolver essbaseResolver;
 
 	private ChosenConnection value;
 
 	public void setModel(ConnectionDialogModel model) {
-		this.model = model;
 
 		serverComboBox.clearItems();
 		if (model.getRecentServer() != null) {

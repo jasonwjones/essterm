@@ -5,4 +5,4 @@
  * @author jasonwjones
  *
  */
-package com.jasonwjones.test.models;
+package com.jasonwjones.essterm.dialogs;

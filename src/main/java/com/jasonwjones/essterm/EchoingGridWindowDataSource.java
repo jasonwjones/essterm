@@ -1,4 +1,4 @@
-package com.jasonwjones.test;
+package com.jasonwjones.essterm;
 
 @Deprecated
 public class EchoingGridWindowDataSource  {

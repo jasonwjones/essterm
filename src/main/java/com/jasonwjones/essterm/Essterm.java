@@ -11,17 +11,17 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
+import com.jasonwjones.essterm.dialogs.AdhocGridWindow;
+import com.jasonwjones.essterm.dialogs.AdhocOptionsDialogWindow;
+import com.jasonwjones.essterm.dialogs.ConnectionDialogWindow;
+import com.jasonwjones.essterm.dialogs.LauncherWindow;
+import com.jasonwjones.essterm.dialogs.ConnectionDialogWindow.ConnectionDialogModel;
+import com.jasonwjones.essterm.dialogs.LauncherWindow.LauncherWindowDelegate;
 import com.jasonwjones.essterm.essbase.EssbaseConnectionResolver;
 import com.jasonwjones.essterm.essgrid.EssbaseEssGridFactory;
 import com.jasonwjones.essterm.grid.EssGrid;
 import com.jasonwjones.essterm.grid.EssGridFactory;
-import com.jasonwjones.test.dialogs.AdhocGridWindow;
-import com.jasonwjones.test.dialogs.AdhocOptionsDialogWindow;
-import com.jasonwjones.test.dialogs.ConnectionDialogWindow;
-import com.jasonwjones.test.dialogs.ConnectionDialogWindow.ConnectionDialogModel;
-import com.jasonwjones.test.dialogs.LauncherWindow;
-import com.jasonwjones.test.dialogs.LauncherWindow.LauncherWindowDelegate;
-import com.jasonwjones.test.models.ChosenConnection;
+import com.jasonwjones.essterm.model.ChosenConnection;
 
 public class EssTerm implements LauncherWindowDelegate {
 

@@ -1,4 +1,4 @@
-package com.jasonwjones.test.dialogs;
+package com.jasonwjones.essterm.dialogs;
 
 import java.util.Collection;
 

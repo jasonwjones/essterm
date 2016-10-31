@@ -1,4 +1,4 @@
-package com.jasonwjones.test.dialogs;
+package com.jasonwjones.essterm.dialogs;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.ActionListBox;
@@ -6,10 +6,10 @@ import com.googlecode.lanterna.gui2.Borders;
 import com.googlecode.lanterna.gui2.GridLayout;
 import com.googlecode.lanterna.gui2.Panel;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
+import com.jasonwjones.essterm.dialogs.adhocoptions.DisplayOptionsPanel;
+import com.jasonwjones.essterm.dialogs.adhocoptions.GeneralOptionsPanel;
+import com.jasonwjones.essterm.dialogs.adhocoptions.ZoomOptionsPanel;
 import com.jasonwjones.essterm.grid.AdhocOptions;
-import com.jasonwjones.test.dialogs.adhocoptions.DisplayOptionsPanel;
-import com.jasonwjones.test.dialogs.adhocoptions.GeneralOptionsPanel;
-import com.jasonwjones.test.dialogs.adhocoptions.ZoomOptionsPanel;
 
 public class AdhocOptionsDialogWindow extends DialogWindow {
 

@@ -11,7 +11,7 @@ import com.jasonwjones.essterm.grid.EssGrid;
 import com.jasonwjones.essterm.grid.EssGridException;
 import com.jasonwjones.essterm.grid.EssGridFactory;
 import com.jasonwjones.essterm.grid.MemberInfoResolver;
-import com.jasonwjones.test.models.ChosenConnection;
+import com.jasonwjones.essterm.model.ChosenConnection;
 
 public class EssbaseEssGridFactory implements EssGridFactory {
 
@@ -30,6 +30,7 @@ public class EssbaseEssGridFactory implements EssGridFactory {
 			IEssCube cube = olapServer.getApplication(connection.getApplication()).getCube(connection.getCube());
 			return new EssbaseEssGrid(cube);
 		} catch (EssException e) {
+			logger.error("Error connecting to Essbase: {}", e);
 			throw new EssGridException("Error connecting to Essbase server", e);
 		} finally {
 //			try {

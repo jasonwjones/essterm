@@ -6,7 +6,7 @@ import org.slf4j.LoggerFactory;
 import com.jasonwjones.essterm.grid.EssGrid;
 import com.jasonwjones.essterm.grid.EssGridFactory;
 import com.jasonwjones.essterm.grid.MemberInfoResolver;
-import com.jasonwjones.test.models.ChosenConnection;
+import com.jasonwjones.essterm.model.ChosenConnection;
 
 public class SimpleEssGridFactory implements EssGridFactory {
 

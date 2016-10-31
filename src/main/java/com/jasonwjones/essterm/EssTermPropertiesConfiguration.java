@@ -1,11 +1,11 @@
-package com.jasonwjones.test;
+package com.jasonwjones.essterm;
 
 import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.jasonwjones.test.models.ConnectionModel;
+import com.jasonwjones.essterm.model.ConnectionModel;
 
 public class EssTermPropertiesConfiguration {
 

@@ -1,4 +1,4 @@
-package com.jasonwjones.test.models;
+package com.jasonwjones.essterm.model;
 
 import java.util.List;
 
