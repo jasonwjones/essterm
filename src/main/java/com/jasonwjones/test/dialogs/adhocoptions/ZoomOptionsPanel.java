@@ -30,6 +30,7 @@ public class ZoomOptionsPanel extends Panel {
 		
 		addComponent(memberRetention.withBorder(Borders.singleLine("Member Retention")));
 		
+		
 	}
 	
 }

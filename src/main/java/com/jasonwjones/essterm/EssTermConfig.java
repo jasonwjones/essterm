@@ -1,5 +1,6 @@
 package com.jasonwjones.essterm;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.springframework.context.annotation.Bean;
@@ -20,9 +21,16 @@ import com.googlecode.lanterna.terminal.Terminal;
 @ComponentScan(basePackages = {"com.jasonwjones"})
 public class EssTermConfig {
 
+	public static final String PROP_FILE = "essterm.properties";
+	
 	@Bean
-	public EssTermSpring getEssTerm() {
-		return new EssTermSpring();
+	public EssTerm getEssTerm() {
+		return new EssTerm();
+	}
+	
+	@Bean
+	public ConnectionManager getConnectionManager() {
+		return new ConnectionManager();
 	}
 	
 	@Bean
@@ -31,6 +39,11 @@ public class EssTermConfig {
 	    Screen screen = new TerminalScreen(terminal);
 	    screen.startScreen();
 	    return new MultiWindowTextGUI(screen, new DefaultWindowManager(), new EmptySpace(TextColor.ANSI.BLUE));
+	}
+	
+	@Bean
+	public SettingsManager settingsManager() {
+		return new PropertyFileSettingsManager(new File(PROP_FILE));
 	}
 	
 }

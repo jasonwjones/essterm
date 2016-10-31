@@ -1,33 +1,26 @@
 package com.jasonwjones.essterm.grid;
 
-public class EssGrid {
+import com.jasonwjones.griddly.Grid;
 
-	// addListener?
+public interface EssGrid {
+	
+	public void retrieve();
 	
 	/**
 	 * Zooms in on the point, using the current zoom settings
 	 * 
 	 * @param point
 	 */
-	public void zoomIn(Point point) {
+	public void zoomIn(Point point);
 
-	}
-
-	public void zoomOut(Point point) {
+	public void zoomOut(Point point);
+			
+	public void keepOnly(Point point);
+			
+	public void removeOnly(Point point);
 		
-	}
+	public void pivot(Point start, Point end);
 	
-	public void keepOnly(Point point) {
+	public Grid<EssCell> getGrid();
 		
-	}
-	
-	public void removeOnly(Point point) {
-		
-	}
-	
-	// CellProcessor -> E[][]
-	
-	// get grid? 
-	//public void zoomIn(Point point, )
-	
 }

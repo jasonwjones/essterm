@@ -1,9 +1,7 @@
 package com.jasonwjones.test;
 
-import com.jasonwjones.essterm.grid.Point;
-import com.jasonwjones.test.dialogs.GridWindow.GridWindowDataSource;
-
-public class EchoingGridWindowDataSource implements GridWindowDataSource {
+@Deprecated
+public class EchoingGridWindowDataSource  {
 
 	private int rows;
 	
@@ -26,10 +24,10 @@ public class EchoingGridWindowDataSource implements GridWindowDataSource {
 		return cols;
 	}
 
-	@Override
-	public void zoomIn(Point point) {
-		// TODO Auto-generated method stub
-		
-	}
+//	@Override
+//	public void zoomIn(Point point) {
+//		// TODO Auto-generated method stub
+//		
+//	}
 
 }

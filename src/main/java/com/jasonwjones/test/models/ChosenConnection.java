@@ -2,13 +2,11 @@ package com.jasonwjones.test.models;
 
 public class ChosenConnection {
 
-	private String server = "test";
+	private String server;
 
 	private String username;
 
 	private String password;
-
-	private String rememberPassword;
 
 	private String application;
 
@@ -38,14 +36,6 @@ public class ChosenConnection {
 		this.password = password;
 	}
 
-	public String getRememberPassword() {
-		return rememberPassword;
-	}
-
-	public void setRememberPassword(String rememberPassword) {
-		this.rememberPassword = rememberPassword;
-	}
-
 	public String getApplication() {
 		return application;
 	}
@@ -62,4 +52,10 @@ public class ChosenConnection {
 		this.cube = cube;
 	}
 
+	@Override
+	public String toString() {
+		return "ChosenConnection [server=" + server + ", username=" + username + ", application=" + application
+				+ ", cube=" + cube + "]";
+	}
+	
 }
