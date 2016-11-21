@@ -18,7 +18,11 @@ public class ConnectionManager {
 	}
 	
 	public void setCurrentConnection(ChosenConnection connection) {
-		this.currentConnection = connection;
+		// kind of a kludge since you can use Esc on conn dialog
+		if (connection.getCube() != null) {
+			this.currentConnection = connection;
+		}
+		
 		logger.info("The current connection is now {}", connection);
 	}
 	

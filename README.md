@@ -5,7 +5,43 @@ be thought of as a terminal based version of the classic Essbase Excel add-in or
 uses a pure-Java library to create a text mode interface that works over a terminal. 
 
 
+## Building
+
+Update logback.xml to not print info messages. Edit the one in src/main/resources
+Run mvn package
+
+## Notes
+
+### Most-Specific-Wins Formatting
+
+A formatting technique that can be thought of as Cascading Style Sheets for an multi-dimensional 
+data set. For example, some general formatting rules that are useful:
+
+ * Two decimals globally
+ * No decimals for Actual and Budget
+ * Something about a measure
+
+## Roadmap / Feature Ideas
+
+ * Query operations in a separate thread
+ * Add member selector
+ * Global formatting
+ * Exporting data
+ * Configuring keybindings
+
 ## Version History
+
+# 0.0.2
+
+ * Respects use aliases option
+ * Setting indentation works
+ * Cleaned up error handing on connections
+ * Don't show duplicate on recent server list
+ * Show custom #Missing text if it's set
+ * Zoom in and keep selection now works (capital A hotkey instead of a)
+ * Can now clear a single data cell (from data cell actions menu)
+ * Can now enter cell data
+ * Cleaned up launcher menu, made grid bigger, enhanced about dialog
 
 # 0.0.1
 

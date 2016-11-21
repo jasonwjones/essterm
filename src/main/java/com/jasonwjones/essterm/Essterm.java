@@ -12,11 +12,11 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
 import com.jasonwjones.essterm.dialogs.AdhocGridWindow;
-import com.jasonwjones.essterm.dialogs.AdhocOptionsDialogWindow;
 import com.jasonwjones.essterm.dialogs.ConnectionDialogWindow;
 import com.jasonwjones.essterm.dialogs.LauncherWindow;
 import com.jasonwjones.essterm.dialogs.ConnectionDialogWindow.ConnectionDialogModel;
 import com.jasonwjones.essterm.dialogs.LauncherWindow.LauncherWindowDelegate;
+import com.jasonwjones.essterm.dialogs.adhocoptions.AdhocOptionsDialogWindow;
 import com.jasonwjones.essterm.essbase.EssbaseConnectionResolver;
 import com.jasonwjones.essterm.essgrid.EssbaseEssGridFactory;
 import com.jasonwjones.essterm.grid.EssGrid;
@@ -40,24 +40,6 @@ public class EssTerm implements LauncherWindowDelegate {
 	private EssbaseConnectionResolver connectionResolver;
 
 	public static void main(String[] args) {
-		// SpringApplication.run(EssTermSpring.class, args);
-		// Use the ConfigurableApplicationContext interface so we have access
-		// to something that implements Closable (and therefore can use with
-		// try-with-resources
-		// try {
-		// IEssbase essbase = IEssbase.Home.create(IEssbase.JAPI_VERSION);
-		// logger.info("Pre sign on");
-		//
-		//
-		//
-		// essbase.signOn("admin", "password", false, null, "embedded",
-		// "epm11124");
-		// logger.info("Post sign on");
-		//
-		// } catch (EssException e) {
-		// System.out.println("Error initting Essbase");
-		// }
-
 		try (ConfigurableApplicationContext context = new AnnotationConfigApplicationContext(EssTermConfig.class)) {
 			EssTerm essTerm = context.getBean(EssTerm.class);
 			essTerm.run();
@@ -65,7 +47,6 @@ public class EssTerm implements LauncherWindowDelegate {
 	}
 
 	public void run() {
-		// System.out.println("Running, widget is: " + widget);
 		LauncherWindow launcherWindow = new LauncherWindow();
 		launcherWindow.setDelegate(this);
 		gui.addWindowAndWait(launcherWindow);
@@ -104,7 +85,7 @@ public class EssTerm implements LauncherWindowDelegate {
 				// perform initial retrieve so we have some data
 				grid.retrieve();
 
-				AdhocGridWindow gridWindow = new AdhocGridWindow("Grid", grid);
+				AdhocGridWindow gridWindow = new AdhocGridWindow(grid, settingsManager.getAdhocOptions());
 				gui.addWindowAndWait(gridWindow);
 			} else {
 				logger.info("Must specify connection");

@@ -14,5 +14,20 @@ public class DoubleEssCell implements EssCell {
 	public String getValue() {
 		return value.toString(); 
 	}
+	
+	@Override
+	public Double getDouble() {
+		return value;
+	}
+
+	@Override
+	public boolean isMissing() {
+		return value == null;
+	}
+	
+	@Override
+	public EssCellType getCellType() {
+		return EssCellType.DATA;
+	}
 
 }

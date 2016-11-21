@@ -28,7 +28,7 @@ public class EssbaseEssGridFactory implements EssGridFactory {
 			olapServer = essbase.signOn(connection.getUsername(), connection.getPassword(), false, null, "embedded",
 					connection.getServer());
 			IEssCube cube = olapServer.getApplication(connection.getApplication()).getCube(connection.getCube());
-			return new EssbaseEssGrid(cube);
+			return new EssbaseEssGrid(connection, cube);
 		} catch (EssException e) {
 			logger.error("Error connecting to Essbase: {}", e);
 			throw new EssGridException("Error connecting to Essbase server", e);

@@ -19,6 +19,7 @@ import com.googlecode.lanterna.gui2.RadioBoxList.Listener;
 import com.googlecode.lanterna.gui2.TextBox;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
 import com.jasonwjones.essterm.EssStringUtils;
 import com.jasonwjones.essterm.essbase.EssbaseConnectionResolver;
 import com.jasonwjones.essterm.model.ChosenConnection;
@@ -50,13 +51,16 @@ public class ConnectionDialogWindow extends DialogWindow {
 			serverComboBox.addItem(model.getRecentServer());
 		}
 		for (String recentServer : model.getRecentServers()) {
-			serverComboBox.addItem(recentServer);
+			if (!recentServer.equals(model.getRecentServer())) {
+				serverComboBox.addItem(recentServer);	
+			}
 		}
 		if (serverComboBox.getItemCount() > 0) {
 			serverComboBox.setSelectedIndex(0);
 		}
 		usernameTextBox.setText(EssStringUtils.nullsafeString(model.getRecentUsername()));
 		passwordTextBox.setText(EssStringUtils.nullsafeString(model.getRecentPassword()));
+		passwordTextBox.setMask('*');
 	}
 	
 	public ConnectionDialogWindow() {
@@ -68,7 +72,6 @@ public class ConnectionDialogWindow extends DialogWindow {
 
 		value = new ChosenConnection();
 
-		// model = new ConnectionDialogModel();
 		setCloseWindowWithEscape(true);
 
 		serverComboBox = new ComboBox<String>("Item 1", "item 2");
@@ -86,6 +89,8 @@ public class ConnectionDialogWindow extends DialogWindow {
 					applicationsListBox.takeFocus();
 				} catch (EssException e) {
 					logger.error("Error logging in: {}", e);
+					showException(e);
+					
 				}
 			}
 		});
@@ -244,4 +249,12 @@ public class ConnectionDialogWindow extends DialogWindow {
 		this.essbaseResolver = essbaseResolver;
 	}
 
+	public void showException(Exception e) {
+		new MessageDialogBuilder()
+			.setTitle("Error")
+			.setText("There was an error logging in to Essbase.\n\n" + e.getMessage())
+			.build()
+			.showDialog(getTextGUI());
+	}
+	
 }

@@ -8,8 +8,11 @@ import org.slf4j.LoggerFactory;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.graphics.Theme;
+import com.googlecode.lanterna.graphics.ThemeDefinition;
 import com.googlecode.lanterna.gui2.ActionListBox;
 import com.googlecode.lanterna.gui2.BasicWindow;
+import com.googlecode.lanterna.gui2.TextGUIGraphics;
+import com.googlecode.lanterna.gui2.table.DefaultTableHeaderRenderer;
 import com.googlecode.lanterna.gui2.table.Table;
 import com.googlecode.lanterna.input.KeyStroke;
 
@@ -22,17 +25,16 @@ public class EssTable<V> extends Table<V> {
 	public EssTable(String... columnLabels) {
 		super(columnLabels);
 		setCellSelection(true);
+		setTableHeaderRenderer(new DummyTableHeaderRenderer<>());
 	}
 
 	@Override
 	public Result handleKeyStroke(KeyStroke keyStroke) {
-		//System.out.println("Key Stroke: " + keyStroke);
 		if (keyStrokeDelegate != null) {
 			if (keyStrokeDelegate.handleKeyStroke(keyStroke)) {
 				return Result.HANDLED;
 			} 
 		} 
-		logger.info("Sending key up the chain");
 		return super.handleKeyStroke(keyStroke);
 	}
 
@@ -80,4 +82,15 @@ public class EssTable<V> extends Table<V> {
         }
     }
 	
+    private static class DummyTableHeaderRenderer<V> extends DefaultTableHeaderRenderer<V> {
+
+		@Override
+		public void drawHeader(Table<V> table, String label, int index, TextGUIGraphics textGUIGraphics) {
+	        ThemeDefinition themeDefinition = table.getThemeDefinition();
+	        textGUIGraphics.applyThemeStyle(themeDefinition.getCustom("HEADER", themeDefinition.getNormal()));
+	        textGUIGraphics.putString(0, 0, "");
+		}
+    	
+    }
+    
 }

@@ -15,4 +15,19 @@ public class SimpleEssCell implements EssCell {
 		return value;
 	}
 	
+	@Override
+	public Double getDouble() {
+		return Double.NaN;
+	}
+
+	@Override
+	public boolean isMissing() {
+		return value == null;
+	}
+	
+	@Override
+	public EssCellType getCellType() {
+		return EssCellType.MEMBER;
+	}
+	
 }

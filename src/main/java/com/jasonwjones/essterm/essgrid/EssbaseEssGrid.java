@@ -1,12 +1,17 @@
 package com.jasonwjones.essterm.essgrid;
 
 import java.util.Collection;
+import java.util.EnumSet;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.essbase.api.base.EssException;
 import com.essbase.api.base.IEssIterator;
 import com.essbase.api.dataquery.IEssCell;
 import com.essbase.api.dataquery.IEssCell.EEssCellType;
 import com.essbase.api.dataquery.IEssCubeView;
+import com.essbase.api.dataquery.IEssCubeView.EEssIndentStyle;
 import com.essbase.api.dataquery.IEssDataCell;
 import com.essbase.api.dataquery.IEssDataCell.EEssDataCellType;
 import com.essbase.api.dataquery.IEssGridView;
@@ -15,6 +20,7 @@ import com.essbase.api.dataquery.IEssOpKeepOnly;
 import com.essbase.api.dataquery.IEssOpPivot;
 import com.essbase.api.dataquery.IEssOpRemoveOnly;
 import com.essbase.api.dataquery.IEssOpRetrieve;
+import com.essbase.api.dataquery.IEssOpUpdate;
 import com.essbase.api.dataquery.IEssOpZoomIn;
 import com.essbase.api.dataquery.IEssOpZoomOut;
 import com.essbase.api.datasource.IEssCube;
@@ -24,6 +30,7 @@ import com.jasonwjones.essterm.grid.EssCell;
 import com.jasonwjones.essterm.grid.EssGrid;
 import com.jasonwjones.essterm.grid.EssGridException;
 import com.jasonwjones.essterm.grid.Point;
+import com.jasonwjones.essterm.model.ChosenConnection;
 import com.jasonwjones.essterm.simplegrid.DoubleEssCell;
 import com.jasonwjones.essterm.simplegrid.SimpleEssCell;
 import com.jasonwjones.griddly.Grid;
@@ -33,24 +40,48 @@ import com.saxifrages.essbase.util.IteratorUtil;
 
 class EssbaseEssGrid implements EssGrid {
 
+	private static final Logger logger = LoggerFactory.getLogger(EssbaseEssGrid.class);
+
 	private IEssCube cube;
 
 	private IEssCubeView cubeView;
 
-	public static final EssCell MISSING = new MissingCell(); 
+	private ChosenConnection connection;
 	
 	public void updateCubeViewProperties(AdhocOptions adhocOptions) throws Exception {
+		// this.adhocOptions = adhocOptions;
+
 		cubeView.setAliasNames(adhocOptions.isUseAliases());
+
+		switch (adhocOptions.getIndentation()) {
+		case NONE:
+			cubeView.setIndentStyle(EEssIndentStyle.NONE);
+			break;
+		case SUBITEMS:
+			cubeView.setIndentStyle(EEssIndentStyle.SUB_ITEMS);
+			break;
+		case TOTALS:
+			cubeView.setIndentStyle(EEssIndentStyle.TOTALS);
+			break;
+		default:
+			break;
+		}
 		cubeView.updatePropertyValues();
 	}
-	
-	public EssbaseEssGrid(IEssCube cube) throws EssGridException {
+
+	public EssbaseEssGrid(ChosenConnection connection, IEssCube cube) throws EssGridException {
+		this.connection = connection;
 		this.cube = cube;
 		try {
 			this.cubeView = cube.openCubeView("Essterm");
 		} catch (EssException e) {
 			throw new EssGridException("Problem opening grid view", e);
 		}
+	}
+	
+	@Override
+	public ChosenConnection getConnection() {
+		return connection;
 	}
 
 	@Override
@@ -68,9 +99,28 @@ class EssbaseEssGrid implements EssGrid {
 		try {
 			IEssOpZoomIn zoomIn = cubeView.createIEssOpZoomIn();
 			zoomIn.addCell(point.getRow(), point.getCol());
+			// EEssZoomInPreference.
 			cubeView.performOperation(zoomIn);
 		} catch (EssException e) {
 			throw new EssGridException("Problem zooming in", e);
+		}
+	}
+
+	@Override
+	public void zoomIn(Point point, EnumSet<ZoomOptions> zoomOptions) throws Exception {
+		boolean needsToSetIncludeBackToFalse = false;
+		if (zoomOptions.contains(ZoomOptions.INCLUDE_SELECTION)) {
+			if (!cubeView.isIncludeSelection()) {
+				needsToSetIncludeBackToFalse = true;
+			}
+			cubeView.setIncludeSelection(true);
+			cubeView.updatePropertyValues();
+		}
+		zoomIn(point);
+
+		if (needsToSetIncludeBackToFalse) {
+			cubeView.setIncludeSelection(false);
+			cubeView.updatePropertyValues();
 		}
 	}
 
@@ -143,7 +193,7 @@ class EssbaseEssGrid implements EssGrid {
 			IEssDataCell dataCell = (IEssDataCell) sourceCell;
 			EEssDataCellType dataCellType = dataCell.getDataCellType();
 			if (dataCellType.equals(EEssDataCellType.MISSING)) {
-				return MISSING;
+				return new MissingCell();
 			} else if (dataCellType.equals(EEssDataCellType.DOUBLE)) {
 				return new DoubleEssCell(dataCell.getDoubleValue());
 			}
@@ -154,9 +204,11 @@ class EssbaseEssGrid implements EssGrid {
 		return new SimpleEssCell("");
 	}
 
+	@Override
 	public Collection<String> getCalcScripts() throws EssGridException {
 		try {
 			IEssIterator calcScriptIterator = cube.getOlapFileObjects(IEssOlapFileObject.TYPE_CALCSCRIPT);
+			logger.info("There are {} calc scripts", calcScriptIterator.getCount());
 			return IteratorUtil.iteratorToList(calcScriptIterator,
 					new ConversionDelegate<IEssOlapFileObject, String>() {
 						@Override
@@ -171,11 +223,52 @@ class EssbaseEssGrid implements EssGrid {
 
 	private static class MissingCell implements EssCell {
 
+		public MissingCell() {
+		}
+
 		@Override
 		public String getValue() {
-			return "#Missing";
+			return null;
 		}
-		
+
+		@Override
+		public Double getDouble() {
+			return null;
+		}
+
+		@Override
+		public boolean isMissing() {
+			return true;
+		}
+
+		@Override
+		public EssCellType getCellType() {
+			return EssCellType.DATA;
+		}
+
 	}
-	
+
+	@Override
+	public void runCalc(String calcName) throws Exception {
+		logger.info("Calc {}", calcName);
+		cube.calculate(false, calcName);
+		logger.info("Finished");
+	}
+
+	@Override
+	public void setData(Point point, double value) throws Exception {
+		IEssOpUpdate update = cubeView.createIEssOpUpdate();
+		IEssGridView gridView = cubeView.getGridView();
+		gridView.setValue(point.getRow(), point.getCol(), value);
+		cubeView.performOperation(update);
+	}
+
+	@Override
+	public void clearData(Point point) throws Exception {
+		IEssOpUpdate update = cubeView.createIEssOpUpdate();
+		IEssGridView gridView = cubeView.getGridView();
+		gridView.setCellContentType(point.getRow(), point.getCol(), IEssGridView.CELL_CONTENT_TYPE_MISSING);
+		cubeView.performOperation(update);
+	}
+
 }

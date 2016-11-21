@@ -1,17 +1,25 @@
 package com.jasonwjones.essterm.dialogs;
 
+import java.util.Arrays;
+
 import com.googlecode.lanterna.TerminalSize;
+import com.googlecode.lanterna.gui2.ActionListBox;
 import com.googlecode.lanterna.gui2.BasicWindow;
 import com.googlecode.lanterna.gui2.Button;
+import com.googlecode.lanterna.gui2.Label;
+import com.googlecode.lanterna.gui2.LinearLayout;
+import com.googlecode.lanterna.gui2.LinearLayout.Alignment;
 import com.googlecode.lanterna.gui2.Panel;
-import com.jasonwjones.essterm.dialogs.MemberSelectionWindow.MemberSelectionWindowDelegate;
+import com.jasonwjones.essterm.model.SimpleMemberSelectionWindowModel;
 
 public class LauncherWindow extends BasicWindow {
 
 	private LauncherWindowDelegate delegate;
 	
+	private boolean devMode = false;
+	
 	public LauncherWindow() {
-		this("Essterm Launcher");
+		this("Essterm");
 	}
 	
 	public void setDelegate(LauncherWindowDelegate delegate) {
@@ -23,37 +31,72 @@ public class LauncherWindow extends BasicWindow {
 		
 		Panel panel = new Panel();
 		panel.setPreferredSize(new TerminalSize(30, 7));
+		
+//		Label connectionLabel = new Label("Not connected");
+//		Label spacer = new Label("");
+//		
+//		panel.addComponent(connectionLabel);
+//		panel.addComponent(spacer);
+		
+		ActionListBox actionBox = new ActionListBox()
+				.setLayoutData(LinearLayout.createLayoutData(Alignment.Fill))
+				.addItem("Connect to a cube", new Runnable() {
+					public void run() {
+						delegate.chooseConnection();
+					}
+				})
+				.addItem("Start an ad hoc grid", new Runnable() {
+					public void run() {
+						delegate.startAdhocGrid();
+					}
+				})
+				.addItem("Member Selection", new Runnable() {
+					public void run() {
+						MemberSelectionWindow msw = new MemberSelectionWindow(new SimpleMemberSelectionWindowModel(Arrays.asList("Time", "Scenario")));
+						getTextGUI().addWindowAndWait(msw);
+					}
+				})
+				.addItem("About", new Runnable() {
+					public void run() {
+						AboutDialog aboutDialog = new AboutDialog("About");
+						getTextGUI().addWindowAndWait(aboutDialog);				
+					}
+				})
+				.addItem("Exit", new Runnable() {
+					public void run() {
+						System.exit(0);
+					}
+				});
+		
+		panel.addComponent(actionBox);
+		/*
 		panel.addComponent(new Button("Connect", new Runnable() {
 			public void run() {
-				connect();
+				delegate.chooseConnection();
 			}
 		}));
 
-		panel.addComponent(new Button("Grid Test", new Runnable() {
+		panel.addComponent(new Button("Start Ad hoc", new Runnable() {
 			public void run() {
 				delegate.startAdhocGrid();
 			}
 		}));
 
-		panel.addComponent(new Button("Member Selector Test", new Runnable() {
-			public void run() {
-				MemberSelectionWindow msw = new MemberSelectionWindow(new MemberSelectionWindowDelegate() {
-					@Override
-					public void didChooseDimension(String dimension) {
-						//System.out.println("Chose dim: " + dimension);
-						
-					}});
-				getTextGUI().addWindowAndWait(msw);
-			}
-		}));
-		
 		panel.addComponent(new Button("Ad hoc Options", new Runnable() {
 			public void run() {
 				delegate.editAdhocOptions();
-//				AdhocOptionsDialogWindow aodw = new AdhocOptionsDialogWindow();
-//				getTextGUI().addWindowAndWait(aodw);
 			}
 		}));
+
+		if (devMode) {
+			panel.addComponent(new Button("Member Selector Test", new Runnable() {
+				public void run() {
+					MemberSelectionWindow msw = new MemberSelectionWindow(new SimpleMemberSelectionWindowModel(Arrays.asList("Time", "Scenario")));
+					getTextGUI().addWindowAndWait(msw);
+				}
+			}));
+		}
+		
 		
 		panel.addComponent(new Button("About", new Runnable() {
 			@Override
@@ -68,14 +111,9 @@ public class LauncherWindow extends BasicWindow {
 				System.exit(0);
 			}
 		}));
+		*/
 
 		setComponent(panel);
-	}
-
-	public void connect() {
-		//System.out.println("Wants connect");
-		delegate.chooseConnection();
-
 	}
 
 	public interface LauncherWindowDelegate {

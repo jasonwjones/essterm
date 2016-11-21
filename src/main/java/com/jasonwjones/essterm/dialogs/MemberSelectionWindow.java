@@ -1,8 +1,8 @@
 package com.jasonwjones.essterm.dialogs;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,12 +12,9 @@ import com.googlecode.lanterna.gui2.ActionListBox;
 import com.googlecode.lanterna.gui2.BasicWindow;
 import com.googlecode.lanterna.gui2.Borders;
 import com.googlecode.lanterna.gui2.Button;
-import com.googlecode.lanterna.gui2.CheckBoxList;
 import com.googlecode.lanterna.gui2.ComboBox;
 import com.googlecode.lanterna.gui2.ComboBox.Listener;
 import com.googlecode.lanterna.gui2.GridLayout;
-import com.googlecode.lanterna.gui2.LinearLayout;
-import com.googlecode.lanterna.gui2.LinearLayout.Alignment;
 import com.googlecode.lanterna.gui2.Panel;
 import com.googlecode.lanterna.gui2.RadioBoxList;
 import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
@@ -25,28 +22,30 @@ import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 public class MemberSelectionWindow extends BasicWindow {
 
 	private static final Logger logger = LoggerFactory.getLogger(MemberSelectionWindow.class);
-	
-	private String currentDimension;
-	
+		
 	private ComboBox<String> dimensionCombo;
 	
-	private CheckBoxList<String> availableMembers;
+	private ActionListBox availableMembers;
 	
-	//private MemberSelectionDelegate memberSelectionDelegate;
+	private ActionListBox selectedMembers;
 	
-	public MemberSelectionWindow(MemberSelectionWindowDelegate delegate) {
+	private MemberSelectionWindowModel model;
+	
+	public MemberSelectionWindow(MemberSelectionWindowModel delegate) {
 		super("Member Selection");
 		setCloseWindowWithEscape(true);
 		setHints(Arrays.asList(Hint.EXPANDED));
 		
+		this.model = delegate;
+		
 		Panel panel = new Panel(new GridLayout(2).setHorizontalSpacing(1));
 				
 		Panel rightPanel = new Panel(new GridLayout(1).setVerticalSpacing(1).setTopMarginSize(1))
-			.setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.FILL, GridLayout.Alignment.FILL));
+			.setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.FILL, GridLayout.Alignment.FILL));		
 		
-		ActionListBox selectedMembers = new ActionListBox(new TerminalSize(15, 8));
+		selectedMembers = new ActionListBox(new TerminalSize(15, 8));
 		selectedMembers
-			.setPreferredSize(new TerminalSize(30, 15))
+			.setPreferredSize(new TerminalSize(30, 10))
 			.setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.FILL, GridLayout.Alignment.FILL, true, true))
 			.addItem("FY14", new Runnable() {
 				@Override
@@ -56,30 +55,32 @@ public class MemberSelectionWindow extends BasicWindow {
 			.setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.FILL, GridLayout.Alignment.FILL, true, true))
 			//.setLayoutData(LinearLayout.createLayoutData(Alignment.Fill))
 			.withBorder(Borders.singleLine("Selected Members"))
+			
 			.addTo(rightPanel);
 	
+		selectedMembers.setAllowRemovesWithDelete(true);
+		
 		//Panel leftPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
 		Panel leftPanel = new Panel(new GridLayout(1).setVerticalSpacing(1).setTopMarginSize(1))
 			.setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.FILL, GridLayout.Alignment.FILL));
 		
-		this.dimensionCombo = new ComboBox<String>("Time", "Scenario")
+		this.dimensionCombo = new ComboBox<String>()
 			.setPreferredSize(new TerminalSize(28, 1))
 			.setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.FILL, GridLayout.Alignment.CENTER, true, true))
 			//.setLayoutData(LinearLayout.createLayoutData(Alignment.Fill))
 			.addListener(new Listener() {
 				@Override
 				public void onSelectionChanged(int selectedIndex, int previousSelection) {
-					changedDimensionSelection(dimensionCombo.getItem(selectedIndex));
+					if (selectedIndex > -1) {
+						changedDimensionSelection(dimensionCombo.getSelectedItem());
+					}
 				}})
 			.addTo(leftPanel);
 		
-		this.availableMembers = new CheckBoxList<String>();
+		this.availableMembers = new ActionListBox();
 		availableMembers
-			.setPreferredSize(new TerminalSize(30, 10))
+			.setPreferredSize(new TerminalSize(30, 8))
 			.setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.FILL, GridLayout.Alignment.FILL, true, true))
-			//.setLayoutData(LinearLayout.createLayoutData(Alignment.Fill))
-//			.addItem("FY15")
-//			.addItem("FY16")
 			.withBorder(Borders.singleLine("Dimension Members"))
 			.addTo(leftPanel);
 				
@@ -116,9 +117,14 @@ public class MemberSelectionWindow extends BasicWindow {
 		
 		
 		setComponent(panel);
-		
-		setAvailableMembers(Arrays.asList("Cola", "Diet Cola with a pretty long name but really it's long", "Grape Soda"));
-		
+		setModel(model);
+	
+	}
+	
+	public MemberSelection getValue() {
+		return null;
+		//selectedMembers.getI
+		// just going to have to cast Runnable
 	}
 	
     //@Override
@@ -136,16 +142,56 @@ public class MemberSelectionWindow extends BasicWindow {
 	
 	private void changedDimensionSelection(String dimensionName) {
 		logger.info("Changed to dim: {}", dimensionName);
+		refreshAvailableMembers();
+	}
+		
+	public interface MemberSelectionWindowModel {
+		
+		public Collection<String> getDimensions();
+		
+		public Collection<String> getMembers(String dimension);
+				
 	}
 	
-	public void refresh() {
+	public static class MemberSelection {
+		
+		private boolean down;
+		
+		private List<String> members;
+
+		public boolean isDown() {
+			return down;
+		}
+
+		public void setDown(boolean down) {
+			this.down = down;
+		}
+
+		public List<String> getMembers() {
+			return members;
+		}
+
+		public void setMembers(List<String> members) {
+			this.members = members;
+		}
 		
 	}
 	
-	public interface MemberSelectionWindowDelegate {
+	public void setModel(MemberSelectionWindowModel model) {
+		dimensionCombo.clearItems();
 		
-		public void didChooseDimension(String dimension);
-		
+		for (String dimension : model.getDimensions()) {
+			dimensionCombo.addItem(dimension);
+		}
+		dimensionCombo.setSelectedIndex(0);
+		refreshAvailableMembers();
+	}
+	
+	public void refreshAvailableMembers() {
+		availableMembers.clearItems();
+		for (String member : model.getMembers(dimensionCombo.getSelectedItem())) {
+			availableMembers.addItem(member, new AvailableMember(member));
+		}
 	}
 	
 	public void setDimensions(Collection<String> dimensions) {
@@ -155,11 +201,33 @@ public class MemberSelectionWindow extends BasicWindow {
 		}
 	}
 	
-	public void setAvailableMembers(Collection<String> availableMembers) {
-		this.availableMembers.clearItems();
-		for (String availableMember : availableMembers) {
-			this.availableMembers.addItem(availableMember);
-		}
-	}	
+//	public void setAvailableMembers(Collection<String> availableMembers) {
+//		this.availableMembers.clearItems();
+//		for (String availableMember : availableMembers) {
+//			this.availableMembers.addItem(availableMember);
+//		}
+//	}	
 
+	private class AvailableMember implements Runnable {
+
+		private String memberName;
+		
+		public AvailableMember(String memberName) {
+			this.memberName = memberName;
+		}
+		
+		@Override
+		public void run() {
+			selectedMembers.addItem(memberName, new Runnable() {
+				@Override
+				public void run() {
+				}});
+			logger.info("Selected: {}", memberName);
+		}
+		
+		
+	}
+	
+	
+	
 }

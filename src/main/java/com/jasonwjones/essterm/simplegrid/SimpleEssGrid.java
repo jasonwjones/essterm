@@ -1,12 +1,17 @@
 package com.jasonwjones.essterm.simplegrid;
 
+import java.util.Collection;
+import java.util.EnumSet;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.jasonwjones.essterm.grid.AdhocOptions;
 import com.jasonwjones.essterm.grid.EssCell;
 import com.jasonwjones.essterm.grid.EssGrid;
+import com.jasonwjones.essterm.grid.EssGridException;
 import com.jasonwjones.essterm.grid.Point;
+import com.jasonwjones.essterm.model.ChosenConnection;
 import com.jasonwjones.griddly.Grid;
 import com.jasonwjones.griddly.impl.BasicGrid;
 
@@ -40,6 +45,10 @@ class SimpleEssGrid implements EssGrid {
 		logger.info("Change row is {}", row);
 		grid.setCellData(row++, 0, new SimpleEssCell("foo"));
 	}
+	
+	public void zoomIn(Point point, EnumSet<ZoomOptions> zoomOptions) throws Exception {
+		zoomIn(point);
+	}
 
 	@Override
 	public void zoomOut(Point point) {
@@ -69,6 +78,34 @@ class SimpleEssGrid implements EssGrid {
 	@Override
 	public void updateCubeViewProperties(AdhocOptions adhocOptions) throws Exception {
 		throw new RuntimeException("Not supported");
+	}
+
+	@Override
+	public Collection<String> getCalcScripts() throws EssGridException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void runCalc(String calcName) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void clearData(Point point) throws Exception {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	@Override
+	public void setData(Point point, double value) throws Exception {
+	}
+
+	@Override
+	public ChosenConnection getConnection() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
