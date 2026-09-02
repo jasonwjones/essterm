@@ -41,6 +41,13 @@ import com.jasonwjones.essterm.grid.EssGrid.ZoomOptions;
 import com.jasonwjones.essterm.grid.Point;
 import com.jasonwjones.essterm.model.ChosenConnection;
 
+/**
+ * This interface element manages a grid, handles keyboard input, and provides
+ * additional UI controls related to the ad hoc experience.
+ * 
+ * @author jasonwjones
+ *
+ */
 public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 
 	private static final Logger logger = LoggerFactory.getLogger(AdhocGridWindow.class);
@@ -51,54 +58,55 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 
 	private EssGrid gridData;
 
-	private Map<KeyStroke, GridAction> keyBindings;
 	private Map<KeyStroke, AdhocGridAction> keyActionBinding;
 	private Map<AdhocGridAction, GridAction> actionGridActionBinding;
 
 	private boolean inPivot = false;
 
 	private Point pivotStart;
-	
+
 	private DecimalFormat formatter = new DecimalFormat("#,###.00");
 
 	private AdhocOptions options;
-	
+
 	private int visibleColumns = 8;
-	
+
 	public AdhocGridWindow(EssGrid gridData, AdhocOptions options) {
 		super();
 		this.setHints(Arrays.asList(Hint.EXPANDED));
 		this.gridData = gridData;
 		this.options = options;
 		ChosenConnection conn = gridData.getConnection();
-		setTitle(String.format("Ad hoc grid: %s/%s", conn.getApplication(), conn.getCube()));
+		setTitle(String.format("Ad hoc grid: %s.%s", conn.getApplication(), conn.getCube()));
 		setCloseWindowWithEscape(true);
 		panel = new Panel(new BorderLayout());
 
 		grid = new EssTable<String>("Dummy");
 		grid.setLayoutData(BorderLayout.Location.CENTER);
-		//grid.setLayoutData(LinearLayout.createLayoutData(Alignment.Fill));
+		// grid.setLayoutData(LinearLayout.createLayoutData(Alignment.Fill));
 		grid.setKeyStrokeDelegate(this);
 
 		grid.setVisibleColumns(visibleColumns);
 
-		//panel.addComponent(new Label("Hi there"));
+		// panel.addComponent(new Label("Hi there"));
 		panel.addComponent(grid);
 
 		Panel statusPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
-		//statusPanel.addComponent(new Button("Test"));
+		// statusPanel.addComponent(new Button("Test"));
 		statusPanel.addComponent(new Label(""));
 		statusPanel.setLayoutData(BorderLayout.Location.BOTTOM);
 		panel.addComponent(statusPanel);
-		
+
 		refreshGrid();
 
 		keyActionBinding = KeyBindingManager.defaultKeyBindings();
 
-		keyBindings = new HashMap<>();
-		keyBindings.put(new KeyStroke('a', false, false), new ZoomIn());
+		actionGridActionBinding = new HashMap<>();
+		// keyBindings = new HashMap<>();
+		actionGridActionBinding.put(AdhocGridAction.ZOOM_IN, new ZoomIn());
+		// keyBindings.put(new KeyStroke('a', false, false), new ZoomIn());
 
-		keyBindings.put(new KeyStroke('A', false, false), new GridAction() {
+		actionGridActionBinding.put(AdhocGridAction.ZOOM_IN_INCLUDE_SELECTION, new GridAction() {
 			@Override
 			public void execute(Point point, EssGrid dataSource) {
 				try {
@@ -109,14 +117,14 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 			}
 		});
 
-		keyBindings.put(new KeyStroke('?', false, false), new GridAction() {
+		actionGridActionBinding.put(AdhocGridAction.KEY_BINDING_OPTIONS, new GridAction() {
 			@Override
 			public void execute(Point point, EssGrid dataSource) {
 				new KeyBindingsWindow(keyActionBinding).showDialog(getTextGUI());
 			}
 		});
 
-		keyBindings.put(new KeyStroke('s', false, false), new GridAction() {
+		actionGridActionBinding.put(AdhocGridAction.ZOOM_OUT, new GridAction() {
 			@Override
 			public void execute(Point point, EssGrid dataSource) {
 				// System.out.println("Zooming out on " + point);
@@ -124,21 +132,21 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 			}
 		});
 
-		keyBindings.put(new KeyStroke('q', false, false), new GridAction() {
+		actionGridActionBinding.put(AdhocGridAction.KEEP_ONLY, new GridAction() {
 			@Override
 			public void execute(Point point, EssGrid dataSource) {
 				dataSource.keepOnly(point);
 			}
 		});
 
-		keyBindings.put(new KeyStroke('w', false, false), new GridAction() {
+		actionGridActionBinding.put(AdhocGridAction.REMOVE_ONLY, new GridAction() {
 			@Override
 			public void execute(Point point, EssGrid dataSource) {
 				dataSource.removeOnly(point);
 			}
 		});
 
-		keyBindings.put(new KeyStroke('v', false, false), new GridAction() {
+		actionGridActionBinding.put(AdhocGridAction.PIVOT, new GridAction() {
 			@Override
 			public void execute(Point point, EssGrid dataSource) {
 				if (!inPivot) {
@@ -151,16 +159,17 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 				}
 			}
 		});
-		
-		keyBindings.put(new KeyStroke('-', false, false), new GridAction() {
+
+		actionGridActionBinding.put(AdhocGridAction.REDUCE_VISIBLE_COLUMNS, new GridAction() {
 			@Override
 			public void execute(Point point, EssGrid dataSource) {
-				if (--visibleColumns < 1) visibleColumns = 1;
+				if (--visibleColumns < 1)
+					visibleColumns = 1;
 				grid.setVisibleColumns(visibleColumns);
 			}
 		});
-		
-		keyBindings.put(new KeyStroke('=', false, false), new GridAction() {
+
+		actionGridActionBinding.put(AdhocGridAction.INCREASE_VISIBLE_COLUMNS, new GridAction() {
 			@Override
 			public void execute(Point point, EssGrid dataSource) {
 				++visibleColumns;
@@ -168,7 +177,7 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 			}
 		});
 
-		keyBindings.put(new KeyStroke('p', false, false), new GridAction() {
+		actionGridActionBinding.put(AdhocGridAction.EDIT_CELL, new GridAction() {
 			@Override
 			public void execute(Point point, EssGrid dataSource) {
 				EssCell cell = gridData.getGrid().getCellData(point.getRow(), point.getCol());
@@ -180,10 +189,10 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 						public void enterCellData() {
 							try {
 								String value = new TextInputDialogBuilder()
-									.setTitle("Enter Cell Value")
-									.setDescription("Enter value")
-									.build()
-									.showDialog(getTextGUI());
+										.setTitle("Enter Cell Value")
+										.setDescription("Enter value")
+										.build()
+										.showDialog(getTextGUI());
 								double numericValue = Double.valueOf(value);
 								gridData.setData(point, numericValue);
 							} catch (Exception e) {
@@ -203,52 +212,29 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 
 					}).showDialog(getTextGUI());
 				} else if (cell.getCellType().equals(EssCellType.MEMBER)) {
-
+					buildMemberCellDialog(new MemberCellActionCallback() {
+						@Override
+						public void enterCellText() {
+							String value = new TextInputDialogBuilder()
+									.setTitle("Enter text")
+									.setDescription("Enter text")
+									.build()
+									.showDialog(getTextGUI());
+							logger.info("Got: {}", value);
+						}});
 				}
 
 			}
 		});
 
-		keyBindings.put(new KeyStroke(',', false, false), new GridAction() {
-			@Override
-			public void execute(Point point, EssGrid dataSource) {
-				buildDataCellDialog(new DataCellActionCallback() {
-
-					@Override
-					public void enterCellData() {
-						try {
-							String value = new TextInputDialogBuilder()
-								.setTitle("Enter Cell Value")
-								.setDescription("Enter value")
-								.build()
-								.showDialog(getTextGUI());
-							double numericValue = Double.valueOf(value);
-							gridData.setData(point, numericValue);
-						} catch (Exception e) {
-							logger.error("Error setting data value: {}", e);
-						}
-					}
-
-					@Override
-					public void clearCell() {
-						try {
-							gridData.clearData(point);
-						} catch (Exception e) {
-							logger.error("Exception clearing: {}", e);
-						}
-					}
-				}).showDialog(getTextGUI());
-			}
-		});
-
-		keyBindings.put(new KeyStroke('o', false, false), new GridAction() {
+		actionGridActionBinding.put(AdhocGridAction.ADHOC_OPTIONS, new GridAction() {
 			@Override
 			public void execute(Point point, EssGrid dataSource) {
 				new AdhocOptionsDialogWindow(options).showDialog(getTextGUI());
 			}
 		});
 
-		keyBindings.put(new KeyStroke('!', false, false), new GridAction() {
+		actionGridActionBinding.put(AdhocGridAction.RUN_CALC, new GridAction() {
 			@Override
 			public void execute(Point point, EssGrid dataSource) {
 				new ActionListDialogBuilder()
@@ -259,32 +245,32 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 		});
 
 		this.addWindowListener(new WindowListener() {
-			
+
 			@Override
 			public void onUnhandledInput(Window basePane, KeyStroke keyStroke, AtomicBoolean hasBeenHandled) {
 				// TODO Auto-generated method stub
-				
+
 			}
-			
+
 			@Override
 			public void onInput(Window basePane, KeyStroke keyStroke, AtomicBoolean deliverEvent) {
 				// TODO Auto-generated method stub
 			}
-			
+
 			@Override
 			public void onResized(Window window, TerminalSize oldSize, TerminalSize newSize) {
 				// seems to refer to inner content sizes
 				logger.info("Resized to {}", newSize);
 				grid.setVisibleRows(newSize.getRows() - 2);
 			}
-			
+
 			@Override
 			public void onMoved(Window window, TerminalPosition oldPosition, TerminalPosition newPosition) {
 				// TODO Auto-generated method stub
-				
+
 			}
 		});
-		
+
 		setComponent(panel);
 	}
 
@@ -322,7 +308,7 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 				default:
 					break;
 				}
-				
+
 			}
 			model.addRow(rowVals);
 		}
@@ -332,12 +318,15 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 	public boolean handleKeyStroke(KeyStroke keyStroke) {
 		if (keyStroke.getKeyType().equals(KeyType.Character)) {
 			Point point = Point.of(grid.getSelectedRow(), grid.getSelectedColumn());
-			GridAction gridAction = keyBindings.get(keyStroke);
-			if (gridAction != null) {
-				gridAction.execute(point, gridData);
-				refreshGrid();
+			AdhocGridAction action = keyActionBinding.get(keyStroke);
+			if (action != null) {
+				GridAction gridAction = actionGridActionBinding.get(action);
+				if (gridAction != null) {
+					gridAction.execute(point, gridData);
+					refreshGrid();
+				}
+				return true;
 			}
-			return true;
 		}
 		return false;
 	}
@@ -385,6 +374,23 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 
 		public void clearCell();
 
+	}
+
+	private interface MemberCellActionCallback {
+
+		public void enterCellText();
+
+	}
+
+	public static ActionListDialog buildMemberCellDialog(MemberCellActionCallback callback) {
+		ActionListDialog actions = new ActionListDialogBuilder()
+				.addAction("Enter text", new Runnable() {
+					@Override
+					public void run() {
+						callback.enterCellText();
+					}
+				}).build();
+		return actions;
 	}
 
 	public static ActionListDialog buildDataCellDialog(DataCellActionCallback callback) {

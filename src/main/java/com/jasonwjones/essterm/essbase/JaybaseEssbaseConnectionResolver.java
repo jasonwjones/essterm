@@ -6,7 +6,6 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 import com.essbase.api.base.EssException;
 import com.essbase.api.datasource.IEssCube;
@@ -16,10 +15,15 @@ import com.essbase.api.session.IEssbase;
 import com.saxifrages.essbase.util.ConversionDelegate;
 import com.saxifrages.essbase.util.IteratorUtil;
 
-@Component
-public class EssbaseConnectionResolver {
+/**
+ * Made temporary copy here so as to be able to clean up for release
+ * @author jasonwjones
+ *
+ */
+//@Component
+public class JaybaseEssbaseConnectionResolver {
 
-	private static final Logger logger = LoggerFactory.getLogger(EssbaseConnectionResolver.class);
+	private static final Logger logger = LoggerFactory.getLogger(JaybaseEssbaseConnectionResolver.class);
 
 	private IEssbase essbase;
 
@@ -27,9 +31,9 @@ public class EssbaseConnectionResolver {
 
 	private boolean isFirstSignOn = true;
 
-	public EssbaseConnectionResolver() throws EssException {
+	public JaybaseEssbaseConnectionResolver() throws EssException {
 		logger.info("Instantiating Essbase connection resolver");
-		this.essbase = IEssbase.Home.create(IEssbase.JAPI_VERSION);
+		//this.essbase = IEssbase.Home.create(IEssbase.JAPI_VERSION);
 		
 //		Yaml yaml = new Yaml();
 //		try {

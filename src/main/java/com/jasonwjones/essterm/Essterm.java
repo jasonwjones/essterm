@@ -13,8 +13,8 @@ import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
 import com.jasonwjones.essterm.dialogs.AdhocGridWindow;
 import com.jasonwjones.essterm.dialogs.ConnectionDialogWindow;
-import com.jasonwjones.essterm.dialogs.LauncherWindow;
 import com.jasonwjones.essterm.dialogs.ConnectionDialogWindow.ConnectionDialogModel;
+import com.jasonwjones.essterm.dialogs.LauncherWindow;
 import com.jasonwjones.essterm.dialogs.LauncherWindow.LauncherWindowDelegate;
 import com.jasonwjones.essterm.dialogs.adhocoptions.AdhocOptionsDialogWindow;
 import com.jasonwjones.essterm.essbase.EssbaseConnectionResolver;
@@ -54,7 +54,6 @@ public class EssTerm implements LauncherWindowDelegate {
 
 	@Override
 	public void chooseConnection() {
-		logger.info("Choosing conn");
 		ConnectionDialogWindow connectionDialog = new ConnectionDialogWindow();
 		connectionDialog.setModel(new SettingsManagerAdapter());
 		connectionDialog.setEssbaseResolver(connectionResolver);
@@ -95,7 +94,7 @@ public class EssTerm implements LauncherWindowDelegate {
 						.build().showDialog(gui);
 			}
 		} catch (Exception e) {
-			logger.error("Problem starting grid: {}", e.getMessage());
+			logger.error("Problem starting grid: {}", e.getMessage(), e);
 		}
 	}
 
@@ -128,5 +127,5 @@ public class EssTerm implements LauncherWindowDelegate {
 		AdhocOptionsDialogWindow optionsDialog = new AdhocOptionsDialogWindow(settingsManager.getAdhocOptions());
 		optionsDialog.showDialog(gui);
 	}
-	
+
 }

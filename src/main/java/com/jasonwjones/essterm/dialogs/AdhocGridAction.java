@@ -10,24 +10,35 @@ package com.jasonwjones.essterm.dialogs;
  */
 public enum AdhocGridAction {
 
-	ZOOM_IN("Zoom in on the selected cell"),
-	ZOOM_IN_INCLUDE_SELECTION("Zoom in and include selection"),
-	ZOOM_OUT("Zoom out"),
-	KEEP_ONLY("Keep only"),
-	REMOVE_ONLY("Remove only"),
-	RUN_CALC("Run calc script"),
-	ADHOC_OPTIONS("Configure ad hoc options"),
-	PIVOT("Pivot the existing cell to a new location"),
-	DATA_CELL_ACTION("Perform action on data cell");
+	ZOOM_IN("Zoom in on the selected cell", "zoom-in"),
+	ZOOM_IN_INCLUDE_SELECTION("Zoom in and include selection", "zoom-in-sel"),
+	ZOOM_OUT("Zoom out", "zoom-out"),
+	KEEP_ONLY("Keep only", "keep-only"),
+	REMOVE_ONLY("Remove only", "remove-only"),
+	RUN_CALC("Run calc script", "run-calc"),
+	ADHOC_OPTIONS("Configure ad hoc options", "conf-ad-hoc"),
+	PIVOT("Pivot the existing cell to a new location", "pivot"),
+	DATA_CELL_ACTION("Perform action on data cell", "data-cell"),
+	KEY_BINDING_OPTIONS("View/edit key bindings", "keybindings"),
+	REDUCE_VISIBLE_COLUMNS("Reduce visible columns", "reduce-vislble"),
+	INCREASE_VISIBLE_COLUMNS("Increase visible columns", "increase-visible"),
+	EDIT_CELL("Edit cell", "edit-cell");
 
 	private String description;
-
-	private AdhocGridAction(String description) {
+	
+	private String code;
+	
+	private AdhocGridAction(String description, String code) {
 		this.description = description;
+		this.code = code;
 	}
 
 	public String getDescription() {
 		return this.description;
+	}
+	
+	public String getCode() {
+		return this.code;
 	}
 
 }

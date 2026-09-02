@@ -84,6 +84,7 @@ public class EssTable<V> extends Table<V> {
 	
     private static class DummyTableHeaderRenderer<V> extends DefaultTableHeaderRenderer<V> {
 
+    	// TODO: Option to enumerate headers with A, B, .. AA, AB, etc.
 		@Override
 		public void drawHeader(Table<V> table, String label, int index, TextGUIGraphics textGUIGraphics) {
 	        ThemeDefinition themeDefinition = table.getThemeDefinition();

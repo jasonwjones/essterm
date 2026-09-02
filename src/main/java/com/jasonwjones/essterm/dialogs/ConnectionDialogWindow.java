@@ -40,7 +40,7 @@ public class ConnectionDialogWindow extends DialogWindow {
 
 	private Button loginButton;
 
-	private EssbaseConnectionResolver essbaseResolver;
+	private EssbaseConnectionResolver essbaseConnectionResolver;
 
 	private ChosenConnection value;
 
@@ -181,7 +181,7 @@ public class ConnectionDialogWindow extends DialogWindow {
 	private void refreshApplications() throws EssException {
 		applicationsListBox.clearItems();
 
-		for (String application : essbaseResolver.getApplications(value.getServer(), value.getUsername(), value.getPassword())) {
+		for (String application : essbaseConnectionResolver.getApplications(value.getServer(), value.getUsername(), value.getPassword())) {
 			applicationsListBox.addItem(application, new ApplicationRunnable(application));
 		}
 	}
@@ -215,7 +215,7 @@ public class ConnectionDialogWindow extends DialogWindow {
 		public void run() {
 			cubesListBox.clearItems();
 			try {
-				for (String cube : essbaseResolver.getCubes(application)) {
+				for (String cube : essbaseConnectionResolver.getCubes(application)) {
 					cubesListBox.addItem(cube);
 				}
 				ConnectionDialogWindow.this.value.setApplication(application);
@@ -242,11 +242,11 @@ public class ConnectionDialogWindow extends DialogWindow {
 	}
 
 	public EssbaseConnectionResolver getEssbaseResolver() {
-		return essbaseResolver;
+		return essbaseConnectionResolver;
 	}
 
 	public void setEssbaseResolver(EssbaseConnectionResolver essbaseResolver) {
-		this.essbaseResolver = essbaseResolver;
+		this.essbaseConnectionResolver = essbaseResolver;
 	}
 
 	public void showException(Exception e) {
