@@ -10,6 +10,13 @@ uses a pure-Java library to create a text mode interface that works over a termi
 Update logback.xml to not print info messages. Edit the one in src/main/resources
 Run mvn package
 
+## Running
+
+`./run.sh` builds and launches essterm for local smoke testing (pass `--no-build` to skip the
+build and just run the existing jar). It launches with `--add-opens java.base/java.lang=ALL-UNNAMED`,
+required because Spring Boot 1.4.1's `@Configuration` class proxying needs reflective access that
+modern JDKs (17+) block by default - drop this flag once essterm is off that old Spring Boot version.
+
 ## Notes
 
 ### Most-Specific-Wins Formatting
