@@ -17,7 +17,7 @@ import com.saxifrages.essbase.util.ConversionDelegate;
 import com.saxifrages.essbase.util.IteratorUtil;
 
 @Component
-public class EssbaseConnectionResolver {
+public class EssbaseConnectionResolver implements ConnectionResolver {
 
 	private static final Logger logger = LoggerFactory.getLogger(EssbaseConnectionResolver.class);
 
@@ -42,6 +42,7 @@ public class EssbaseConnectionResolver {
 //		}		
 	}
 
+	@Override
 	public List<String> getApplications(String server, String username, String password) throws EssException {
 
 		PrintStream out = null;
@@ -78,6 +79,7 @@ public class EssbaseConnectionResolver {
 		
 	}
 
+	@Override
 	public List<String> getCubes(String application) throws EssException {
 		List<String> cubes = IteratorUtil.iteratorToList(this.server.getApplication(application).getCubes(),
 				new ConversionDelegate<IEssCube, String>() {
@@ -89,6 +91,7 @@ public class EssbaseConnectionResolver {
 		return cubes;
 	}
 
+	@Override
 	public void disconnect() throws EssException {
 		if (this.server != null && this.server.isConnected()) {
 			logger.info("Disconnecting Essbase server");

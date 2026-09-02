@@ -5,7 +5,6 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.essbase.api.base.EssException;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.ActionListBox;
 import com.googlecode.lanterna.gui2.Borders;
@@ -21,7 +20,7 @@ import com.googlecode.lanterna.gui2.WindowBasedTextGUI;
 import com.googlecode.lanterna.gui2.dialogs.DialogWindow;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
 import com.jasonwjones.essterm.EssStringUtils;
-import com.jasonwjones.essterm.essbase.EssbaseConnectionResolver;
+import com.jasonwjones.essterm.essbase.ConnectionResolver;
 import com.jasonwjones.essterm.model.ChosenConnection;
 
 public class ConnectionDialogWindow extends DialogWindow {
@@ -40,7 +39,7 @@ public class ConnectionDialogWindow extends DialogWindow {
 
 	private Button loginButton;
 
-	private EssbaseConnectionResolver essbaseConnectionResolver;
+	private ConnectionResolver essbaseConnectionResolver;
 
 	private ChosenConnection value;
 
@@ -87,7 +86,7 @@ public class ConnectionDialogWindow extends DialogWindow {
 					value.setPassword(passwordTextBox.getText());
 					refreshApplications();
 					applicationsListBox.takeFocus();
-				} catch (EssException e) {
+				} catch (Exception e) {
 					logger.error("Error logging in: {}", e);
 					showException(e);
 					
@@ -178,7 +177,7 @@ public class ConnectionDialogWindow extends DialogWindow {
 		setComponent(containerPanel);
 	}
 
-	private void refreshApplications() throws EssException {
+	private void refreshApplications() throws Exception {
 		applicationsListBox.clearItems();
 
 		for (String application : essbaseConnectionResolver.getApplications(value.getServer(), value.getUsername(), value.getPassword())) {
@@ -222,7 +221,7 @@ public class ConnectionDialogWindow extends DialogWindow {
 				//logger.info("CDW: {}", ConnectionDialogWindow.this.value.getApplication());
 				cubesListBox.takeFocus();
 
-			} catch (EssException e) {
+			} catch (Exception e) {
 				logger.error("Error fetching cubes: {}", e);
 			}
 		}
@@ -241,11 +240,11 @@ public class ConnectionDialogWindow extends DialogWindow {
 
 	}
 
-	public EssbaseConnectionResolver getEssbaseResolver() {
+	public ConnectionResolver getEssbaseResolver() {
 		return essbaseConnectionResolver;
 	}
 
-	public void setEssbaseResolver(EssbaseConnectionResolver essbaseResolver) {
+	public void setEssbaseResolver(ConnectionResolver essbaseResolver) {
 		this.essbaseConnectionResolver = essbaseResolver;
 	}
 

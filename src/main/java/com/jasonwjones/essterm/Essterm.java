@@ -17,7 +17,7 @@ import com.jasonwjones.essterm.dialogs.ConnectionDialogWindow.ConnectionDialogMo
 import com.jasonwjones.essterm.dialogs.LauncherWindow;
 import com.jasonwjones.essterm.dialogs.LauncherWindow.LauncherWindowDelegate;
 import com.jasonwjones.essterm.dialogs.adhocoptions.AdhocOptionsDialogWindow;
-import com.jasonwjones.essterm.essbase.EssbaseConnectionResolver;
+import com.jasonwjones.essterm.essbase.ConnectionResolver;
 import com.jasonwjones.essterm.essgrid.EssbaseEssGridFactory;
 import com.jasonwjones.essterm.grid.EssGrid;
 import com.jasonwjones.essterm.grid.EssGridFactory;
@@ -37,7 +37,7 @@ public class EssTerm implements LauncherWindowDelegate {
 	private SettingsManager settingsManager;
 
 	@Autowired
-	private EssbaseConnectionResolver connectionResolver;
+	private ConnectionResolver connectionResolver;
 
 	public static void main(String[] args) {
 		try (ConfigurableApplicationContext context = new AnnotationConfigApplicationContext(EssTermConfig.class)) {
