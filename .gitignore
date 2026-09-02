@@ -8,4 +8,7 @@ target/
 .classpath
 .project
 .settings/
+
+# Runtime state rewritten on every launch (recent connections, credentials)
+essterm.properties
 ~             
