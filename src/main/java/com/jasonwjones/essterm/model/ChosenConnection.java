@@ -2,6 +2,12 @@ package com.jasonwjones.essterm.model;
 
 public class ChosenConnection {
 
+	public enum Backend {
+		JAPI, REST
+	}
+
+	private Backend backend = Backend.JAPI;
+
 	private String server;
 
 	private String username;
@@ -11,6 +17,14 @@ public class ChosenConnection {
 	private String application;
 
 	private String cube;
+
+	public Backend getBackend() {
+		return backend;
+	}
+
+	public void setBackend(Backend backend) {
+		this.backend = backend;
+	}
 
 	public String getServer() {
 		return server;
@@ -54,8 +68,8 @@ public class ChosenConnection {
 
 	@Override
 	public String toString() {
-		return "ChosenConnection [server=" + server + ", username=" + username + ", application=" + application
-				+ ", cube=" + cube + "]";
+		return "ChosenConnection [backend=" + backend + ", server=" + server + ", username=" + username
+				+ ", application=" + application + ", cube=" + cube + "]";
 	}
 	
 }

@@ -7,6 +7,8 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Date;
+import java.util.EnumMap;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
@@ -15,13 +17,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.jasonwjones.essterm.grid.AdhocOptions;
+import com.jasonwjones.essterm.model.ChosenConnection.Backend;
 
 public class PropertyFileSettingsManager implements SettingsManager {
 
 	private static final Logger logger = LoggerFactory.getLogger(PropertyFileSettingsManager.class);
-	
-	private Set<String> recentlyUsedServers;
-	
+
+	/**
+	 * Recently-used servers are tracked separately per backend, since a JAPI server and a REST
+	 * endpoint URL are never valid interchangeably. Persisted as {@code <BACKEND>|<server>} so old
+	 * (pre-REST) plain server entries can still be read back as legacy JAPI entries.
+	 */
+	private Map<Backend, Set<String>> recentlyUsedServers;
+
 	private String recentUsername;
 	
 	private String recentPassword; 
@@ -42,18 +50,34 @@ public class PropertyFileSettingsManager implements SettingsManager {
 	}
 	
 	public void initSettings() {
-		recentlyUsedServers = new TreeSet<>();
+		recentlyUsedServers = new EnumMap<>(Backend.class);
+		for (Backend backend : Backend.values()) {
+			recentlyUsedServers.put(backend, new TreeSet<>());
+		}
 	}
-	
-	private final void loadSettings(File file) throws IOException {		
+
+	private final void loadSettings(File file) throws IOException {
 		Properties properties = new Properties();
-		try (Reader reader = new FileReader(file)) {	
+		try (Reader reader = new FileReader(file)) {
 			properties.load(reader);
 		}
 
 		properties.forEach((key, value) -> {
 			if (key.toString().startsWith("essterm.connections.recent")) {
-				recentlyUsedServers.add(value.toString());
+				String entry = value.toString();
+				Backend backend = Backend.JAPI;
+				String server = entry;
+				int separator = entry.indexOf('|');
+				if (separator >= 0) {
+					try {
+						backend = Backend.valueOf(entry.substring(0, separator));
+						server = entry.substring(separator + 1);
+					} catch (IllegalArgumentException e) {
+						// not a recognized "BACKEND|server" entry - treat the whole value as a
+						// legacy (pre-REST) JAPI server, same as if there were no separator at all
+					}
+				}
+				recentlyUsedServers.get(backend).add(server);
 			}
 		});
 		recentUsername = properties.getProperty("essterm.connections.username");
@@ -61,34 +85,36 @@ public class PropertyFileSettingsManager implements SettingsManager {
 
 		logger.info("Loaded settings from {}", file);
 	}
-	
+
 	public void saveSettings() throws IOException {
 		saveSettings(this.settingsFile);
 	}
-	
+
 	public void saveSettings(File file) throws IOException {
 		Properties properties = new Properties();
-		
+
 		int index = 0;
-		for (String recentlyUsedServer : recentlyUsedServers) {
-			properties.put("essterm.connections.recent." + index++, recentlyUsedServer);
+		for (Backend backend : Backend.values()) {
+			for (String recentlyUsedServer : recentlyUsedServers.get(backend)) {
+				properties.put("essterm.connections.recent." + index++, backend + "|" + recentlyUsedServer);
+			}
 		}
 		properties.put("essterm.connections.username", recentUsername);
 		properties.put("essterm.connections.password", recentPassword);
-		
+
 		try (Writer writer = new FileWriter(file)) {
 			properties.store(writer, "Properties updated at " + new Date());
 		}
 	}
-	
+
 	@Override
-	public void addRecentlyUsedServer(String server) {
-		recentlyUsedServers.add(server);
+	public void addRecentlyUsedServer(Backend backend, String server) {
+		recentlyUsedServers.get(backend).add(server);
 	}
 
 	@Override
-	public Set<String> getRecentlyUsedServers() {
-		return recentlyUsedServers;
+	public Set<String> getRecentlyUsedServers(Backend backend) {
+		return recentlyUsedServers.get(backend);
 	}
 	
 	@Override
@@ -112,9 +138,10 @@ public class PropertyFileSettingsManager implements SettingsManager {
 	}
 
 	@Override
-	public String getRecentServer() {
-		if (!recentlyUsedServers.isEmpty()) {
-			return recentlyUsedServers.iterator().next();
+	public String getRecentServer(Backend backend) {
+		Set<String> servers = recentlyUsedServers.get(backend);
+		if (!servers.isEmpty()) {
+			return servers.iterator().next();
 		} else {
 			return null;
 		}

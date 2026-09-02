@@ -9,6 +9,7 @@ import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.ActionListBox;
 import com.googlecode.lanterna.gui2.Borders;
 import com.googlecode.lanterna.gui2.Button;
+import com.googlecode.lanterna.gui2.CheckBox;
 import com.googlecode.lanterna.gui2.ComboBox;
 import com.googlecode.lanterna.gui2.GridLayout;
 import com.googlecode.lanterna.gui2.Label;
@@ -22,12 +23,15 @@ import com.googlecode.lanterna.gui2.dialogs.MessageDialogBuilder;
 import com.jasonwjones.essterm.EssStringUtils;
 import com.jasonwjones.essterm.essbase.ConnectionResolver;
 import com.jasonwjones.essterm.model.ChosenConnection;
+import com.jasonwjones.essterm.model.ChosenConnection.Backend;
 
 public class ConnectionDialogWindow extends DialogWindow {
 
 	private static final Logger logger = LoggerFactory.getLogger(ConnectionDialogWindow.class);
 
 	private ComboBox<String> serverComboBox;
+
+	private Label serverLabel;
 
 	private TextBox usernameTextBox;
 
@@ -39,27 +43,56 @@ public class ConnectionDialogWindow extends DialogWindow {
 
 	private Button loginButton;
 
-	private ConnectionResolver essbaseConnectionResolver;
+	private CheckBox useRestCheckBox;
+
+	private ConnectionResolver japiResolver;
+
+	private ConnectionResolver restResolver;
 
 	private ChosenConnection value;
 
+	private ConnectionDialogModel model;
+
+	private ConnectionResolver currentResolver() {
+		return useRestCheckBox.isChecked() ? restResolver : japiResolver;
+	}
+
+	private Backend currentBackend() {
+		return useRestCheckBox.isChecked() ? Backend.REST : Backend.JAPI;
+	}
+
 	public void setModel(ConnectionDialogModel model) {
+		this.model = model;
+		refreshServerList();
+		usernameTextBox.setText(EssStringUtils.nullsafeString(model.getRecentUsername()));
+		passwordTextBox.setText(EssStringUtils.nullsafeString(model.getRecentPassword()));
+		passwordTextBox.setMask('*');
+	}
+
+	/**
+	 * Repopulates the server combo box with recent servers for whichever backend is currently
+	 * selected - JAPI servers and REST endpoint URLs are never valid interchangeably, so each
+	 * backend keeps its own recent-server history rather than sharing one mixed list.
+	 */
+	private void refreshServerList() {
+		if (model == null) {
+			return;
+		}
+		Backend backend = currentBackend();
+		String recentServer = model.getRecentServer(backend);
 
 		serverComboBox.clearItems();
-		if (model.getRecentServer() != null) {
-			serverComboBox.addItem(model.getRecentServer());
+		if (recentServer != null) {
+			serverComboBox.addItem(recentServer);
 		}
-		for (String recentServer : model.getRecentServers()) {
-			if (!recentServer.equals(model.getRecentServer())) {
-				serverComboBox.addItem(recentServer);	
+		for (String server : model.getRecentServers(backend)) {
+			if (!server.equals(recentServer)) {
+				serverComboBox.addItem(server);
 			}
 		}
 		if (serverComboBox.getItemCount() > 0) {
 			serverComboBox.setSelectedIndex(0);
 		}
-		usernameTextBox.setText(EssStringUtils.nullsafeString(model.getRecentUsername()));
-		passwordTextBox.setText(EssStringUtils.nullsafeString(model.getRecentPassword()));
-		passwordTextBox.setMask('*');
 	}
 	
 	public ConnectionDialogWindow() {
@@ -96,6 +129,17 @@ public class ConnectionDialogWindow extends DialogWindow {
 		
 		usernameTextBox = new TextBox(new TerminalSize(14, 1));
 		passwordTextBox = new TextBox(new TerminalSize(14, 1));
+
+		serverLabel = new Label("Server");
+
+		useRestCheckBox = new CheckBox("Use REST API");
+		useRestCheckBox.addListener(new CheckBox.Listener() {
+			@Override
+			public void onStatusChanged(boolean checked) {
+				serverLabel.setText(checked ? "Server (endpoint URL)" : "Server");
+				refreshServerList();
+			}
+		});
 
 		// right side panel
 		Panel rightPanel = new Panel();
@@ -147,7 +191,10 @@ public class ConnectionDialogWindow extends DialogWindow {
 //		Panel innerTopPanel = new Panel(
 //				new GridLayout(2).setVerticalSpacing(1).setTopMarginSize(1).setBottomMarginSize(1));
 
-		topPanel.addComponent(new Label("Server"));
+		topPanel.addComponent(new Label("Backend"));
+		topPanel.addComponent(useRestCheckBox);
+
+		topPanel.addComponent(serverLabel);
 		topPanel.addComponent(serverComboBox);
 
 		topPanel.addComponent(new Label("Username"));
@@ -180,7 +227,7 @@ public class ConnectionDialogWindow extends DialogWindow {
 	private void refreshApplications() throws Exception {
 		applicationsListBox.clearItems();
 
-		for (String application : essbaseConnectionResolver.getApplications(value.getServer(), value.getUsername(), value.getPassword())) {
+		for (String application : currentResolver().getApplications(value.getServer(), value.getUsername(), value.getPassword())) {
 			applicationsListBox.addItem(application, new ApplicationRunnable(application));
 		}
 	}
@@ -195,6 +242,7 @@ public class ConnectionDialogWindow extends DialogWindow {
 		value.setServer(serverComboBox.getText());
 		value.setUsername(usernameTextBox.getText());
 		value.setPassword(passwordTextBox.getText());
+		value.setBackend(useRestCheckBox.isChecked() ? Backend.REST : Backend.JAPI);
 		// application is filled in when selected
 		value.setCube(cubesListBox.getSelectedItem());
 		return value;
@@ -214,7 +262,7 @@ public class ConnectionDialogWindow extends DialogWindow {
 		public void run() {
 			cubesListBox.clearItems();
 			try {
-				for (String cube : essbaseConnectionResolver.getCubes(application)) {
+				for (String cube : currentResolver().getCubes(application)) {
 					cubesListBox.addItem(cube);
 				}
 				ConnectionDialogWindow.this.value.setApplication(application);
@@ -230,22 +278,22 @@ public class ConnectionDialogWindow extends DialogWindow {
 
 	public static interface ConnectionDialogModel {
 
-		public Set<String> getRecentServers();
-		
-		public String getRecentServer();
-		
+		public Set<String> getRecentServers(Backend backend);
+
+		public String getRecentServer(Backend backend);
+
 		public String getRecentUsername();
-		
+
 		public String getRecentPassword();
 
 	}
 
-	public ConnectionResolver getEssbaseResolver() {
-		return essbaseConnectionResolver;
+	public void setJapiResolver(ConnectionResolver japiResolver) {
+		this.japiResolver = japiResolver;
 	}
 
-	public void setEssbaseResolver(ConnectionResolver essbaseResolver) {
-		this.essbaseConnectionResolver = essbaseResolver;
+	public void setRestResolver(ConnectionResolver restResolver) {
+		this.restResolver = restResolver;
 	}
 
 	public void showException(Exception e) {

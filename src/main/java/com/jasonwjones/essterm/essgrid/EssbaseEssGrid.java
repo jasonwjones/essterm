@@ -32,6 +32,7 @@ import com.jasonwjones.essterm.grid.EssGridException;
 import com.jasonwjones.essterm.grid.Point;
 import com.jasonwjones.essterm.model.ChosenConnection;
 import com.jasonwjones.essterm.simplegrid.DoubleEssCell;
+import com.jasonwjones.essterm.simplegrid.MissingCell;
 import com.jasonwjones.essterm.simplegrid.SimpleEssCell;
 import com.jasonwjones.griddly.Grid;
 import com.jasonwjones.griddly.impl.BasicGrid;
@@ -219,33 +220,6 @@ class EssbaseEssGrid implements EssGrid {
 		} catch (EssException e) {
 			throw new EssGridException("Error fetching calc scripts", e);
 		}
-	}
-
-	private static class MissingCell implements EssCell {
-
-		public MissingCell() {
-		}
-
-		@Override
-		public String getValue() {
-			return null;
-		}
-
-		@Override
-		public Double getDouble() {
-			return null;
-		}
-
-		@Override
-		public boolean isMissing() {
-			return true;
-		}
-
-		@Override
-		public EssCellType getCellType() {
-			return EssCellType.DATA;
-		}
-
 	}
 
 	@Override

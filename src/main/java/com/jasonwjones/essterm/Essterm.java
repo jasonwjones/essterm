@@ -17,11 +17,14 @@ import com.jasonwjones.essterm.dialogs.ConnectionDialogWindow.ConnectionDialogMo
 import com.jasonwjones.essterm.dialogs.LauncherWindow;
 import com.jasonwjones.essterm.dialogs.LauncherWindow.LauncherWindowDelegate;
 import com.jasonwjones.essterm.dialogs.adhocoptions.AdhocOptionsDialogWindow;
-import com.jasonwjones.essterm.essbase.ConnectionResolver;
+import com.jasonwjones.essterm.essbase.EssbaseConnectionResolver;
+import com.jasonwjones.essterm.essbase.RestConnectionResolver;
 import com.jasonwjones.essterm.essgrid.EssbaseEssGridFactory;
+import com.jasonwjones.essterm.essgrid.RestEssGridFactory;
 import com.jasonwjones.essterm.grid.EssGrid;
 import com.jasonwjones.essterm.grid.EssGridFactory;
 import com.jasonwjones.essterm.model.ChosenConnection;
+import com.jasonwjones.essterm.model.ChosenConnection.Backend;
 
 public class EssTerm implements LauncherWindowDelegate {
 
@@ -37,7 +40,10 @@ public class EssTerm implements LauncherWindowDelegate {
 	private SettingsManager settingsManager;
 
 	@Autowired
-	private ConnectionResolver connectionResolver;
+	private EssbaseConnectionResolver japiConnectionResolver;
+
+	@Autowired
+	private RestConnectionResolver restConnectionResolver;
 
 	public static void main(String[] args) {
 		try (ConfigurableApplicationContext context = new AnnotationConfigApplicationContext(EssTermConfig.class)) {
@@ -56,12 +62,13 @@ public class EssTerm implements LauncherWindowDelegate {
 	public void chooseConnection() {
 		ConnectionDialogWindow connectionDialog = new ConnectionDialogWindow();
 		connectionDialog.setModel(new SettingsManagerAdapter());
-		connectionDialog.setEssbaseResolver(connectionResolver);
+		connectionDialog.setJapiResolver(japiConnectionResolver);
+		connectionDialog.setRestResolver(restConnectionResolver);
 
 		ChosenConnection chosen = connectionDialog.showDialog(gui);
 		this.connectionManager.setCurrentConnection(chosen);
 
-		this.settingsManager.addRecentlyUsedServer(chosen.getServer());
+		this.settingsManager.addRecentlyUsedServer(chosen.getBackend(), chosen.getServer());
 		this.settingsManager.setRecentUsername(chosen.getUsername());
 		this.settingsManager.setRecentPassword(chosen.getPassword());
 		try {
@@ -76,8 +83,11 @@ public class EssTerm implements LauncherWindowDelegate {
 		logger.info("Starting a new ad hoc grid");
 		try {
 			if (connectionManager.hasConnection()) {
-				EssGridFactory gridFactory = new EssbaseEssGridFactory();
-				EssGrid grid = gridFactory.createEssGrid(connectionManager.getCurrentConnection());
+				ChosenConnection connection = connectionManager.getCurrentConnection();
+				EssGridFactory gridFactory = connection.getBackend() == ChosenConnection.Backend.REST
+						? new RestEssGridFactory()
+						: new EssbaseEssGridFactory();
+				EssGrid grid = gridFactory.createEssGrid(connection);
 
 				grid.updateCubeViewProperties(settingsManager.getAdhocOptions());
 
@@ -101,13 +111,13 @@ public class EssTerm implements LauncherWindowDelegate {
 	private class SettingsManagerAdapter implements ConnectionDialogModel {
 
 		@Override
-		public Set<String> getRecentServers() {
-			return settingsManager.getRecentlyUsedServers();
+		public Set<String> getRecentServers(Backend backend) {
+			return settingsManager.getRecentlyUsedServers(backend);
 		}
 
 		@Override
-		public String getRecentServer() {
-			return settingsManager.getRecentServer();
+		public String getRecentServer(Backend backend) {
+			return settingsManager.getRecentServer(backend);
 		}
 
 		@Override

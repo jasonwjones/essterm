@@ -69,6 +69,11 @@
 			<artifactId>essbase-utils</artifactId>
 			<version>1.2.2</version>
 		</dependency>
+		<dependency>
+			<groupId>com.appliedolap.essbase</groupId>
+			<artifactId>essbase-rest-client</artifactId>
+			<version>2.0.2-SNAPSHOT</version>
+		</dependency>
 		<!-- <dependency> <groupId>org.springframework</groupId> <artifactId>spring-context</artifactId> 
 			<version>4.3.1.RELEASE</version> </dependency> -->
 		<dependency>
