@@ -16,15 +16,14 @@
 		</encoder>
 	</appender>
 
+	<!-- STDOUT is defined above but deliberately unused by default: Lanterna owns the terminal's
+		cursor positioning while the app is running, and any concurrent console output (this logger
+		included) visually corrupts its screen. Swap FILE for STDOUT below only when running outside
+		the terminal UI (e.g. non-interactively). -->
 	<logger name="com.jasonwjones" level="info" additivity="false">
-		<appender-ref ref="STDOUT" />
-	</logger>
-	<!-- 
-	<logger name="com.jasonwjones" level="debug" additivity="false">
 		<appender-ref ref="FILE" />
 	</logger>
-	-->	
 	<root level="error">
-		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILE" />
 	</root>
 </configuration>

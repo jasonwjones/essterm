@@ -7,7 +7,6 @@ uses a pure-Java library to create a text mode interface that works over a termi
 
 ## Building
 
-Update logback.xml to not print info messages. Edit the one in src/main/resources
 Run mvn package
 
 ## Running
@@ -16,6 +15,10 @@ Run mvn package
 build and just run the existing jar). It launches with `--add-opens java.base/java.lang=ALL-UNNAMED`,
 required because Spring Boot 1.4.1's `@Configuration` class proxying needs reflective access that
 modern JDKs (17+) block by default - drop this flag once essterm is off that old Spring Boot version.
+
+App logging goes to `testFile.log`, not the console, by default - see the note in logback.xml.
+Lanterna owns the terminal's cursor positioning while the app runs, so any concurrent console
+output visually corrupts the screen.
 
 ## Notes
 
