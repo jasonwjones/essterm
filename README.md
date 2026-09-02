@@ -12,9 +12,7 @@ Run mvn package
 ## Running
 
 `./run.sh` builds and launches essterm for local smoke testing (pass `--no-build` to skip the
-build and just run the existing jar). It launches with `--add-opens java.base/java.lang=ALL-UNNAMED`,
-required because Spring Boot 1.4.1's `@Configuration` class proxying needs reflective access that
-modern JDKs (17+) block by default - drop this flag once essterm is off that old Spring Boot version.
+build and just run the existing jar).
 
 App logging goes to `testFile.log`, not the console, by default - see the note in logback.xml.
 Lanterna owns the terminal's cursor positioning while the app runs, so any concurrent console
