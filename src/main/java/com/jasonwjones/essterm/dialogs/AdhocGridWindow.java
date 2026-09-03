@@ -72,6 +72,12 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 
 	private int visibleColumns = 8;
 
+	private static final String DEFAULT_STATUS = "Press ? for key bindings";
+
+	private Label statusLabel;
+
+	private boolean showingAllBindings = false;
+
 	public AdhocGridWindow(EssGrid gridData, AdhocOptions options) {
 		super();
 		this.setHints(Arrays.asList(Hint.EXPANDED));
@@ -93,7 +99,8 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 		panel.addComponent(grid);
 
 		Panel statusPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
-		statusPanel.addComponent(new Label("Press ? for key bindings"));
+		statusLabel = new Label(DEFAULT_STATUS);
+		statusPanel.addComponent(statusLabel);
 		statusPanel.setLayoutData(BorderLayout.Location.BOTTOM);
 		panel.addComponent(statusPanel);
 
@@ -121,6 +128,14 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 			@Override
 			public void execute(Point point, EssGrid dataSource) {
 				new KeyBindingsWindow(keyActionBinding).showDialog(getTextGUI());
+			}
+		});
+
+		actionGridActionBinding.put(AdhocGridAction.TOGGLE_KEY_BINDINGS_BAR, new GridAction() {
+			@Override
+			public void execute(Point point, EssGrid dataSource) {
+				showingAllBindings = !showingAllBindings;
+				statusLabel.setText(showingAllBindings ? buildAllBindingsText() : DEFAULT_STATUS);
 			}
 		});
 
@@ -283,6 +298,17 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 		setComponent(panel);
 	}
 
+	private String buildAllBindingsText() {
+		StringBuilder text = new StringBuilder();
+		for (Map.Entry<KeyStroke, AdhocGridAction> entry : keyActionBinding.entrySet()) {
+			if (text.length() > 0) {
+				text.append(", ");
+			}
+			text.append(entry.getKey().getCharacter()).append("=").append(entry.getValue().getCode().replace('-', ' '));
+		}
+		return text.toString();
+	}
+
 	public void refreshGrid() {
 		// if
 		// panel.removeComponent(grid);
@@ -331,8 +357,12 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 			if (action != null) {
 				GridAction gridAction = actionGridActionBinding.get(action);
 				if (gridAction != null) {
-					gridAction.execute(point, gridData);
-					refreshGrid();
+					try {
+						gridAction.execute(point, gridData);
+						refreshGrid();
+					} catch (Exception e) {
+						logger.error("Error performing {} at {}: {}", action, point, e.getMessage(), e);
+					}
 				}
 				return true;
 			}

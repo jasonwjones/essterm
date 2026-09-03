@@ -1,6 +1,6 @@
 package com.jasonwjones.essterm.dialogs.adhoc;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Properties;
 
@@ -10,7 +10,9 @@ import com.jasonwjones.essterm.dialogs.AdhocGridAction;
 public class KeyBindingManager {
 	
 	public static Map<KeyStroke, AdhocGridAction> defaultKeyBindings() {
-		Map<KeyStroke, AdhocGridAction> defaultBindings = new HashMap<>();
+		// LinkedHashMap so the bindings bar (AdhocGridWindow.buildAllBindingsText) lists these in a
+		// stable, sensible order instead of HashMap's arbitrary one.
+		Map<KeyStroke, AdhocGridAction> defaultBindings = new LinkedHashMap<>();
 
 		defaultBindings.put(charKey('a'), AdhocGridAction.ZOOM_IN);
 		defaultBindings.put(charKey('A'), AdhocGridAction.ZOOM_IN_INCLUDE_SELECTION);
@@ -23,6 +25,7 @@ public class KeyBindingManager {
 		defaultBindings.put(charKey('o'), AdhocGridAction.ADHOC_OPTIONS);
 		defaultBindings.put(charKey('?'), AdhocGridAction.KEY_BINDING_OPTIONS);
 		defaultBindings.put(charKey('m'), AdhocGridAction.MEMBER_SELECTION);
+		defaultBindings.put(charKey('k'), AdhocGridAction.TOGGLE_KEY_BINDINGS_BAR);
 
 		return defaultBindings;
 	}
