@@ -76,7 +76,7 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 
 	private Label statusLabel;
 
-	private boolean showingAllBindings = false;
+	private boolean showingAllBindings = true;
 
 	public AdhocGridWindow(EssGrid gridData, AdhocOptions options) {
 		super();
@@ -98,15 +98,15 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 		// panel.addComponent(new Label("Hi there"));
 		panel.addComponent(grid);
 
+		keyActionBinding = KeyBindingManager.defaultKeyBindings();
+
 		Panel statusPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
-		statusLabel = new Label(DEFAULT_STATUS);
+		statusLabel = new Label(showingAllBindings ? buildAllBindingsText() : DEFAULT_STATUS);
 		statusPanel.addComponent(statusLabel);
 		statusPanel.setLayoutData(BorderLayout.Location.BOTTOM);
 		panel.addComponent(statusPanel);
 
 		refreshGrid();
-
-		keyActionBinding = KeyBindingManager.defaultKeyBindings();
 
 		actionGridActionBinding = new HashMap<>();
 		// keyBindings = new HashMap<>();
@@ -298,13 +298,27 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 		setComponent(panel);
 	}
 
+	// Lanterna's Label never wraps on its own - it only ever breaks on an explicit "\n" - so with a
+	// dozen-plus bindings the bar would otherwise render as one line far wider than any terminal and
+	// just get clipped. Wrap by hand at a conservative width instead, breaking between whole entries
+	// (never mid-entry) so it reads fine even in a narrow window, at the cost of using extra rows.
+	private static final int BINDINGS_BAR_WRAP_WIDTH = 60;
+
 	private String buildAllBindingsText() {
 		StringBuilder text = new StringBuilder();
+		int lineLength = 0;
 		for (Map.Entry<KeyStroke, AdhocGridAction> entry : keyActionBinding.entrySet()) {
-			if (text.length() > 0) {
-				text.append(", ");
+			String rendered = entry.getKey().getCharacter() + "=" + entry.getValue().getCode().replace('-', ' ');
+			if (lineLength == 0) {
+				text.append(rendered);
+				lineLength = rendered.length();
+			} else if (lineLength + 2 + rendered.length() > BINDINGS_BAR_WRAP_WIDTH) {
+				text.append(",\n").append(rendered);
+				lineLength = rendered.length();
+			} else {
+				text.append(", ").append(rendered);
+				lineLength += 2 + rendered.length();
 			}
-			text.append(entry.getKey().getCharacter()).append("=").append(entry.getValue().getCode().replace('-', ' '));
 		}
 		return text.toString();
 	}
