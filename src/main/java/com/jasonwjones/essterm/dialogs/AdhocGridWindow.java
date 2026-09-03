@@ -378,22 +378,19 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 			if (action != null) {
 				GridAction gridAction = actionGridActionBinding.get(action);
 				if (gridAction != null) {
-					int columnsBefore = gridData.getGrid().getColumns();
 					try {
 						gridAction.execute(point, gridData);
 						refreshGrid();
-						// The selected column index survives refreshGrid() unchanged, so when an
-						// action grows the column axis (e.g. zooming in on the rightmost/last
-						// column dimension), the table's viewport has no reason to auto-scroll -
-						// the newly added columns silently render off-screen to the right with no
-						// on-screen hint that they exist. New columns appear starting at the acted-
-						// upon position (point.getCol()), so scroll the view there: whatever fits
-						// of the new content is now the first thing shown, regardless of how many
-						// columns physically fit in the current terminal width.
-						int columnsAfter = gridData.getGrid().getColumns();
-						if (columnsAfter > columnsBefore) {
-							grid.setViewLeftColumn(point.getCol());
-						}
+						// refreshGrid() swaps in a brand new TableModel; Lanterna preserves the
+						// selected row/column index across that swap only while it's still in bounds
+						// for the new grid - once an action shrinks the grid enough that it isn't
+						// (e.g. zooming back out), the selection silently resets to (0, 0) instead of
+						// clamping to the nearest valid cell. Restore it explicitly so the highlighted
+						// cell stays where the user left it (or as close as the new grid allows).
+						int newRows = gridData.getGrid().getRows();
+						int newCols = gridData.getGrid().getColumns();
+						grid.setSelectedRow(Math.min(point.getRow(), newRows - 1));
+						grid.setSelectedColumn(Math.min(point.getCol(), newCols - 1));
 					} catch (Exception e) {
 						logger.error("Error performing {} at {}: {}", action, point, e.getMessage(), e);
 					}
