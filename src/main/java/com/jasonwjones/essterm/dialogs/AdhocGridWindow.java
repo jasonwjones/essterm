@@ -357,9 +357,22 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 			if (action != null) {
 				GridAction gridAction = actionGridActionBinding.get(action);
 				if (gridAction != null) {
+					int columnsBefore = gridData.getGrid().getColumns();
 					try {
 						gridAction.execute(point, gridData);
 						refreshGrid();
+						// The selected column index survives refreshGrid() unchanged, so when an
+						// action grows the column axis (e.g. zooming in on the rightmost/last
+						// column dimension), the table's viewport has no reason to auto-scroll -
+						// the newly added columns silently render off-screen to the right with no
+						// on-screen hint that they exist. New columns appear starting at the acted-
+						// upon position (point.getCol()), so scroll the view there: whatever fits
+						// of the new content is now the first thing shown, regardless of how many
+						// columns physically fit in the current terminal width.
+						int columnsAfter = gridData.getGrid().getColumns();
+						if (columnsAfter > columnsBefore) {
+							grid.setViewLeftColumn(point.getCol());
+						}
 					} catch (Exception e) {
 						logger.error("Error performing {} at {}: {}", action, point, e.getMessage(), e);
 					}
