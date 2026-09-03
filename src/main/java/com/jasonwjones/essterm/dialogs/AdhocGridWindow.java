@@ -78,11 +78,16 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 
 	private boolean showingAllBindings = true;
 
-	public AdhocGridWindow(EssGrid gridData, AdhocOptions options) {
+	// Named differently from the "options" field on purpose: this constructor parameter's scope
+	// reaches into every anonymous GridAction defined below (they're all instantiated inside this
+	// constructor), and a same-named parameter shadows the field there - a bare "options" reference
+	// inside one of those would silently capture this constructor argument's original value forever,
+	// never seeing later reassignments of the field (e.g. after saving the options dialog).
+	public AdhocGridWindow(EssGrid gridData, AdhocOptions initialOptions) {
 		super();
 		this.setHints(Arrays.asList(Hint.EXPANDED));
 		this.gridData = gridData;
-		this.options = options;
+		this.options = initialOptions;
 		ChosenConnection conn = gridData.getConnection();
 		setTitle(String.format("Ad hoc grid: %s.%s", conn.getApplication(), conn.getCube()));
 		setCloseWindowWithEscape(true);
@@ -264,7 +269,7 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 				AdhocOptionsDialogWindow dialog = new AdhocOptionsDialogWindow(options, dataSource.getSupportedOptions());
 				dialog.showDialog(getTextGUI());
 				if (dialog.isSaved()) {
-					AdhocGridWindow.this.options = dialog.getValue();
+					options = dialog.getValue();
 					try {
 						dataSource.updateCubeViewProperties(options);
 						dataSource.retrieve();
