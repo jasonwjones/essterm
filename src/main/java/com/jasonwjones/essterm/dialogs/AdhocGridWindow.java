@@ -303,6 +303,9 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 				// seems to refer to inner content sizes
 				logger.info("Resized to {}", newSize);
 				grid.setVisibleRows(newSize.getRows() - 2);
+				if (showingAllBindings) {
+					statusLabel.setText(buildAllBindingsText());
+				}
 			}
 
 			@Override
@@ -315,13 +318,22 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 		setComponent(panel);
 	}
 
+	// Used only before the window has been shown/sized once (see currentWrapWidth) - a reasonable
+	// guess for a typical terminal, not a hard limit.
+	private static final int DEFAULT_BINDINGS_BAR_WRAP_WIDTH = 100;
+
 	// Lanterna's Label never wraps on its own - it only ever breaks on an explicit "\n" - so with a
 	// dozen-plus bindings the bar would otherwise render as one line far wider than any terminal and
-	// just get clipped. Wrap by hand at a conservative width instead, breaking between whole entries
-	// (never mid-entry) so it reads fine even in a narrow window, at the cost of using extra rows.
-	private static final int BINDINGS_BAR_WRAP_WIDTH = 60;
+	// just get clipped. Wrap by hand instead, breaking between whole entries (never mid-entry), at
+	// whatever width the window is actually showing at right now, so a wide terminal gets it in as
+	// few lines as it actually allows instead of an arbitrary conservative guess.
+	private int currentWrapWidth() {
+		TerminalSize size = getSize();
+		return size != null && size.getColumns() > 10 ? size.getColumns() - 2 : DEFAULT_BINDINGS_BAR_WRAP_WIDTH;
+	}
 
 	private String buildAllBindingsText() {
+		int wrapWidth = currentWrapWidth();
 		StringBuilder text = new StringBuilder();
 		int lineLength = 0;
 		for (Map.Entry<KeyStroke, AdhocGridAction> entry : keyActionBinding.entrySet()) {
@@ -329,7 +341,7 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 			if (lineLength == 0) {
 				text.append(rendered);
 				lineLength = rendered.length();
-			} else if (lineLength + 2 + rendered.length() > BINDINGS_BAR_WRAP_WIDTH) {
+			} else if (lineLength + 2 + rendered.length() > wrapWidth) {
 				text.append(",\n").append(rendered);
 				lineLength = rendered.length();
 			} else {
