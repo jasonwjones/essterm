@@ -2,6 +2,7 @@ package com.jasonwjones.essterm.essgrid;
 
 import java.util.Collection;
 import java.util.EnumSet;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +30,8 @@ import com.jasonwjones.essterm.grid.AdhocOptions;
 import com.jasonwjones.essterm.grid.EssCell;
 import com.jasonwjones.essterm.grid.EssGrid;
 import com.jasonwjones.essterm.grid.EssGridException;
+import com.jasonwjones.essterm.grid.EssMemberNode;
+import com.jasonwjones.essterm.grid.MemberPlacement;
 import com.jasonwjones.essterm.grid.Point;
 import com.jasonwjones.essterm.model.ChosenConnection;
 import com.jasonwjones.essterm.simplegrid.DoubleEssCell;
@@ -243,6 +246,21 @@ class EssbaseEssGrid implements EssGrid {
 		IEssGridView gridView = cubeView.getGridView();
 		gridView.setCellContentType(point.getRow(), point.getCol(), IEssGridView.CELL_CONTENT_TYPE_MISSING);
 		cubeView.performOperation(update);
+	}
+
+	@Override
+	public List<String> getDimensionNames() {
+		throw new UnsupportedOperationException("Member selection is only supported via the REST backend for now");
+	}
+
+	@Override
+	public EssMemberNode getDimensionRoot(String dimensionName) {
+		throw new UnsupportedOperationException("Member selection is only supported via the REST backend for now");
+	}
+
+	@Override
+	public void setMembers(List<MemberPlacement> placements) {
+		throw new UnsupportedOperationException("Member selection is only supported via the REST backend for now");
 	}
 
 }

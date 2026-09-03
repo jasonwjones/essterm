@@ -1,7 +1,5 @@
 package com.jasonwjones.essterm.dialogs;
 
-import java.util.Arrays;
-
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.ActionListBox;
 import com.googlecode.lanterna.gui2.BasicWindow;
@@ -10,14 +8,11 @@ import com.googlecode.lanterna.gui2.Label;
 import com.googlecode.lanterna.gui2.LinearLayout;
 import com.googlecode.lanterna.gui2.LinearLayout.Alignment;
 import com.googlecode.lanterna.gui2.Panel;
-import com.jasonwjones.essterm.model.SimpleMemberSelectionWindowModel;
 
 public class LauncherWindow extends BasicWindow {
 
 	private LauncherWindowDelegate delegate;
-	
-	private boolean devMode = false;
-	
+
 	public LauncherWindow() {
 		this("Essterm");
 	}
@@ -48,12 +43,6 @@ public class LauncherWindow extends BasicWindow {
 				.addItem("Start an ad hoc grid", new Runnable() {
 					public void run() {
 						delegate.startAdhocGrid();
-					}
-				})
-				.addItem("Member Selection", new Runnable() {
-					public void run() {
-						MemberSelectionWindow msw = new MemberSelectionWindow(new SimpleMemberSelectionWindowModel(Arrays.asList("Time", "Scenario")));
-						getTextGUI().addWindowAndWait(msw);
 					}
 				})
 				.addItem("About", new Runnable() {
@@ -88,16 +77,6 @@ public class LauncherWindow extends BasicWindow {
 			}
 		}));
 
-		if (devMode) {
-			panel.addComponent(new Button("Member Selector Test", new Runnable() {
-				public void run() {
-					MemberSelectionWindow msw = new MemberSelectionWindow(new SimpleMemberSelectionWindowModel(Arrays.asList("Time", "Scenario")));
-					getTextGUI().addWindowAndWait(msw);
-				}
-			}));
-		}
-		
-		
 		panel.addComponent(new Button("About", new Runnable() {
 			@Override
 			public void run() {

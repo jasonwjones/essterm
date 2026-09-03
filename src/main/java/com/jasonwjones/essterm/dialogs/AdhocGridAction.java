@@ -22,7 +22,8 @@ public enum AdhocGridAction {
 	KEY_BINDING_OPTIONS("View/edit key bindings", "keybindings"),
 	REDUCE_VISIBLE_COLUMNS("Reduce visible columns", "reduce-vislble"),
 	INCREASE_VISIBLE_COLUMNS("Increase visible columns", "increase-visible"),
-	EDIT_CELL("Edit cell", "edit-cell");
+	EDIT_CELL("Edit cell", "edit-cell"),
+	MEMBER_SELECTION("Select members and place in grid", "member-selection");
 
 	private String description;
 	

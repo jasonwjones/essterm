@@ -10,11 +10,14 @@ import org.slf4j.LoggerFactory;
 
 import com.appliedolap.essbase.EssCube;
 import com.appliedolap.essbase.EssCubeView;
+import com.appliedolap.essbase.EssDimension;
 import com.appliedolap.essbase.EssScript;
 import com.jasonwjones.essterm.grid.AdhocOptions;
 import com.jasonwjones.essterm.grid.EssCell;
 import com.jasonwjones.essterm.grid.EssGrid;
 import com.jasonwjones.essterm.grid.EssGridException;
+import com.jasonwjones.essterm.grid.EssMemberNode;
+import com.jasonwjones.essterm.grid.MemberPlacement;
 import com.jasonwjones.essterm.grid.Point;
 import com.jasonwjones.essterm.model.ChosenConnection;
 import com.jasonwjones.essterm.simplegrid.DoubleEssCell;
@@ -45,6 +48,11 @@ class RestEssGrid implements EssGrid {
 	RestEssGrid(ChosenConnection connection, EssCube cube) {
 		this.connection = connection;
 		this.cube = cube;
+		// openCubeView() alone isn't actually a fresh default: the REST API silently persists every
+		// grid operation into a hidden per-user layout and reads it back on the next "default grid"
+		// request, so without this reset a new ad hoc grid would pick up wherever a previous session
+		// left off instead of the genuinely blank starting point a new grid should be.
+		cube.resetDefaultView();
 		this.cubeView = cube.openCubeView();
 	}
 
@@ -147,6 +155,30 @@ class RestEssGrid implements EssGrid {
 	@Override
 	public void updateCubeViewProperties(AdhocOptions adhocOptions) {
 		logger.debug("Ad hoc display options (aliases, indentation) are not yet applied via the REST API");
+	}
+
+	@Override
+	public List<String> getDimensionNames() {
+		List<String> names = new ArrayList<>();
+		for (EssDimension dimension : cube.getDimensions()) {
+			names.add(dimension.getName());
+		}
+		return names;
+	}
+
+	@Override
+	public EssMemberNode getDimensionRoot(String dimensionName) {
+		return new RestMemberNode(cube.getMember(dimensionName));
+	}
+
+	@Override
+	public void setMembers(List<MemberPlacement> placements) {
+		List<EssCubeView.MemberPlacement> restPlacements = new ArrayList<>();
+		for (MemberPlacement placement : placements) {
+			restPlacements.add(new EssCubeView.MemberPlacement(
+					placement.getPoint().getRow(), placement.getPoint().getCol(), placement.getMemberName()));
+		}
+		cubeView.setMembers(restPlacements);
 	}
 
 }

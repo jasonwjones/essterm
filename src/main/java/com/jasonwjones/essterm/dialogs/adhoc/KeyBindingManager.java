@@ -22,6 +22,7 @@ public class KeyBindingManager {
 		defaultBindings.put(charKey('p'), AdhocGridAction.DATA_CELL_ACTION);
 		defaultBindings.put(charKey('o'), AdhocGridAction.ADHOC_OPTIONS);
 		defaultBindings.put(charKey('?'), AdhocGridAction.KEY_BINDING_OPTIONS);
+		defaultBindings.put(charKey('m'), AdhocGridAction.MEMBER_SELECTION);
 
 		return defaultBindings;
 	}

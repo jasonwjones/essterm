@@ -40,6 +40,7 @@ import com.jasonwjones.essterm.grid.EssGrid;
 import com.jasonwjones.essterm.grid.EssGrid.ZoomOptions;
 import com.jasonwjones.essterm.grid.Point;
 import com.jasonwjones.essterm.model.ChosenConnection;
+import com.jasonwjones.essterm.model.EssGridMemberSelectionWindowModel;
 
 /**
  * This interface element manages a grid, handles keyboard input, and provides
@@ -92,8 +93,7 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 		panel.addComponent(grid);
 
 		Panel statusPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
-		// statusPanel.addComponent(new Button("Test"));
-		statusPanel.addComponent(new Label(""));
+		statusPanel.addComponent(new Label("Press ? for key bindings"));
 		statusPanel.setLayoutData(BorderLayout.Location.BOTTOM);
 		panel.addComponent(statusPanel);
 
@@ -121,6 +121,15 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 			@Override
 			public void execute(Point point, EssGrid dataSource) {
 				new KeyBindingsWindow(keyActionBinding).showDialog(getTextGUI());
+			}
+		});
+
+		actionGridActionBinding.put(AdhocGridAction.MEMBER_SELECTION, new GridAction() {
+			@Override
+			public void execute(Point point, EssGrid dataSource) {
+				MemberSelectionWindow msw = new MemberSelectionWindow(
+						new EssGridMemberSelectionWindowModel(dataSource), point);
+				msw.showDialog(getTextGUI());
 			}
 		});
 
