@@ -21,6 +21,7 @@ public class KeyBindingManager {
 		defaultBindings.put(charKey('v'), AdhocGridAction.PIVOT);
 		defaultBindings.put(charKey('p'), AdhocGridAction.DATA_CELL_ACTION);
 		defaultBindings.put(charKey('o'), AdhocGridAction.ADHOC_OPTIONS);
+		defaultBindings.put(charKey('?'), AdhocGridAction.KEY_BINDING_OPTIONS);
 
 		return defaultBindings;
 	}

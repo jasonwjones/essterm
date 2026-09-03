@@ -57,9 +57,7 @@ public class MemberSelectionWindow extends BasicWindow {
 			.withBorder(Borders.singleLine("Selected Members"))
 			
 			.addTo(rightPanel);
-	
-		selectedMembers.setAllowRemovesWithDelete(true);
-		
+
 		//Panel leftPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
 		Panel leftPanel = new Panel(new GridLayout(1).setVerticalSpacing(1).setTopMarginSize(1))
 			.setLayoutData(GridLayout.createLayoutData(GridLayout.Alignment.FILL, GridLayout.Alignment.FILL));
@@ -70,7 +68,7 @@ public class MemberSelectionWindow extends BasicWindow {
 			//.setLayoutData(LinearLayout.createLayoutData(Alignment.Fill))
 			.addListener(new Listener() {
 				@Override
-				public void onSelectionChanged(int selectedIndex, int previousSelection) {
+				public void onSelectionChanged(int selectedIndex, int previousSelection, boolean changedByUserInteraction) {
 					if (selectedIndex > -1) {
 						changedDimensionSelection(dimensionCombo.getSelectedItem());
 					}

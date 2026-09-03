@@ -10,7 +10,6 @@ import com.googlecode.lanterna.gui2.Label;
 import com.googlecode.lanterna.gui2.LinearLayout;
 import com.googlecode.lanterna.gui2.LinearLayout.Alignment;
 import com.googlecode.lanterna.gui2.Panel;
-import com.jasonwjones.essterm.dialogs.adhoc.KeyBindingManager;
 import com.jasonwjones.essterm.model.SimpleMemberSelectionWindowModel;
 
 public class LauncherWindow extends BasicWindow {
@@ -57,12 +56,6 @@ public class LauncherWindow extends BasicWindow {
 						getTextGUI().addWindowAndWait(msw);
 					}
 				})
-				.addItem("Key Mappings", new Runnable() {
-					public void run() {
-						KeyBindingsWindow kbw = new KeyBindingsWindow(KeyBindingManager.defaultKeyBindings());
-						getTextGUI().addWindowAndWait(kbw);
-					}
-				})				
 				.addItem("About", new Runnable() {
 					public void run() {
 						AboutDialog aboutDialog = new AboutDialog("About");
