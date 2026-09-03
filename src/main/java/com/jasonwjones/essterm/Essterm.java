@@ -7,6 +7,7 @@ import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -19,12 +20,12 @@ import com.jasonwjones.essterm.dialogs.LauncherWindow;
 import com.jasonwjones.essterm.dialogs.LauncherWindow.LauncherWindowDelegate;
 import com.jasonwjones.essterm.dialogs.RecentConnectionsWindow;
 import com.jasonwjones.essterm.dialogs.adhocoptions.AdhocOptionsDialogWindow;
-import com.jasonwjones.essterm.essbase.EssbaseConnectionResolver;
+import com.jasonwjones.essterm.essbase.ConnectionResolver;
 import com.jasonwjones.essterm.essbase.RestConnectionResolver;
-import com.jasonwjones.essterm.essgrid.EssbaseEssGridFactory;
 import com.jasonwjones.essterm.essgrid.RestEssGridFactory;
 import com.jasonwjones.essterm.grid.AdhocOptionCapability;
 import com.jasonwjones.essterm.grid.EssGrid;
+import com.jasonwjones.essterm.grid.EssGridException;
 import com.jasonwjones.essterm.grid.EssGridFactory;
 import com.jasonwjones.essterm.model.ChosenConnection;
 import com.jasonwjones.essterm.model.ChosenConnection.Backend;
@@ -42,8 +43,18 @@ public class EssTerm implements LauncherWindowDelegate {
 	@Autowired
 	private SettingsManager settingsManager;
 
-	@Autowired
-	private EssbaseConnectionResolver japiConnectionResolver;
+	// Both null unless the "japi" Maven profile was active at build time (see pom.xml) - a standard
+	// release doesn't compile in the classes these beans would be, so there's nothing for Spring to
+	// find. required=false lets that be a graceful "JAPI unavailable" rather than a startup failure;
+	// the qualifiers pick out the JAPI-backed bean specifically, since both of these interfaces also
+	// have a REST-backed implementation in the context.
+	@Autowired(required = false)
+	@Qualifier("essbaseConnectionResolver")
+	private ConnectionResolver japiConnectionResolver;
+
+	@Autowired(required = false)
+	@Qualifier("essbaseEssGridFactory")
+	private EssGridFactory japiGridFactory;
 
 	@Autowired
 	private RestConnectionResolver restConnectionResolver;
@@ -119,9 +130,17 @@ public class EssTerm implements LauncherWindowDelegate {
 		try {
 			if (connectionManager.hasConnection()) {
 				ChosenConnection connection = connectionManager.getCurrentConnection();
-				EssGridFactory gridFactory = connection.getBackend() == ChosenConnection.Backend.REST
-						? new RestEssGridFactory()
-						: new EssbaseEssGridFactory();
+				EssGridFactory gridFactory;
+				if (connection.getBackend() == ChosenConnection.Backend.REST) {
+					gridFactory = new RestEssGridFactory();
+				} else if (japiGridFactory != null) {
+					gridFactory = japiGridFactory;
+				} else {
+					// Shouldn't happen - the Connect dialog disables the JAPI option entirely when
+					// it's unavailable - but a stale ChosenConnection (e.g. from Recents, saved by an
+					// earlier japi-profile build) could still name it.
+					throw new EssGridException("Essbase Java API support isn't available in this build", null);
+				}
 				EssGrid grid = gridFactory.createEssGrid(connection);
 
 				grid.updateCubeViewProperties(settingsManager.getAdhocOptions());

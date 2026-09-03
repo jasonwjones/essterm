@@ -2,6 +2,7 @@ package com.jasonwjones.essterm.essgrid;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import com.essbase.api.base.EssException;
 import com.essbase.api.datasource.IEssCube;
@@ -13,6 +14,11 @@ import com.jasonwjones.essterm.grid.EssGridFactory;
 import com.jasonwjones.essterm.grid.MemberInfoResolver;
 import com.jasonwjones.essterm.model.ChosenConnection;
 
+// Only present when the "japi" Maven profile is active (see pom.xml) - a standard release build
+// doesn't include this class or the Oracle Essbase JARs it depends on at all. EssTerm looks this
+// bean up by interface + qualifier with required=false, so its absence degrades gracefully to
+// "JAPI unavailable" rather than a startup failure.
+@Component
 public class EssbaseEssGridFactory implements EssGridFactory {
 
 	private static final Logger logger = LoggerFactory.getLogger(EssbaseEssGridFactory.class);

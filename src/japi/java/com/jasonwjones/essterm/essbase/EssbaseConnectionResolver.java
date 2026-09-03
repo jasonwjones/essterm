@@ -16,6 +16,10 @@ import com.essbase.api.session.IEssbase;
 import com.saxifrages.essbase.util.ConversionDelegate;
 import com.saxifrages.essbase.util.IteratorUtil;
 
+// Only present when the "japi" Maven profile is active (see pom.xml) - a standard release build
+// doesn't include this class or the Oracle Essbase JARs it depends on at all. EssTerm looks this
+// bean up by interface + qualifier with required=false, so its absence degrades gracefully to
+// "JAPI unavailable" (the Connect dialog greys out the option) rather than a startup failure.
 @Component
 public class EssbaseConnectionResolver implements ConnectionResolver {
 

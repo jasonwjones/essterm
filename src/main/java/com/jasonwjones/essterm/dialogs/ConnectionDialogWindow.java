@@ -45,6 +45,8 @@ public class ConnectionDialogWindow extends DialogWindow {
 
 	private CheckBox useRestCheckBox;
 
+	private Label japiAvailabilityLabel;
+
 	private ConnectionResolver japiResolver;
 
 	private ConnectionResolver restResolver;
@@ -133,6 +135,7 @@ public class ConnectionDialogWindow extends DialogWindow {
 		serverLabel = new Label("Server");
 
 		useRestCheckBox = new CheckBox("Use REST API");
+		useRestCheckBox.setChecked(true);
 		useRestCheckBox.addListener(new CheckBox.Listener() {
 			@Override
 			public void onStatusChanged(boolean checked) {
@@ -140,6 +143,11 @@ public class ConnectionDialogWindow extends DialogWindow {
 				refreshServerList();
 			}
 		});
+
+		// Populated (and the checkbox disabled/forced on) once setJapiResolver() is called, if the
+		// current build has no Essbase Java API support - i.e. the "japi" Maven profile wasn't active
+		// when it was built. Left blank until then so it doesn't flash a false "unavailable" message.
+		japiAvailabilityLabel = new Label("");
 
 		// right side panel
 		Panel rightPanel = new Panel();
@@ -193,6 +201,9 @@ public class ConnectionDialogWindow extends DialogWindow {
 
 		topPanel.addComponent(new Label("Backend"));
 		topPanel.addComponent(useRestCheckBox);
+
+		topPanel.addComponent(new Label(""));
+		topPanel.addComponent(japiAvailabilityLabel);
 
 		topPanel.addComponent(serverLabel);
 		topPanel.addComponent(serverComboBox);
@@ -290,6 +301,18 @@ public class ConnectionDialogWindow extends DialogWindow {
 
 	public void setJapiResolver(ConnectionResolver japiResolver) {
 		this.japiResolver = japiResolver;
+		boolean available = japiResolver != null;
+		useRestCheckBox.setEnabled(available);
+		if (!available) {
+			// Force REST since there's no JAPI backend to fall back to if unchecked - setChecked()
+			// alone won't do that here since the box is also being disabled, which stops it from
+			// ever being toggled back off by the user anyway, but this keeps currentBackend() correct
+			// even if this is called after the box was already unchecked some other way.
+			useRestCheckBox.setChecked(true);
+			japiAvailabilityLabel.setText("(i) Add the Essbase Java API JARs to enable - see pom.xml's \"japi\" profile");
+		} else {
+			japiAvailabilityLabel.setText("");
+		}
 	}
 
 	public void setRestResolver(ConnectionResolver restResolver) {

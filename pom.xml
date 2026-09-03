@@ -65,16 +65,11 @@
 			<version>3.1.5</version>
 		</dependency>
 		<dependency>
-			<groupId>com.saxifrages.essbase</groupId>
-			<artifactId>essbase-utils</artifactId>
-			<version>1.2.2</version>
-		</dependency>
-		<dependency>
 			<groupId>com.appliedolap.essbase</groupId>
 			<artifactId>essbase-rest-client</artifactId>
 			<version>2.0.2-SNAPSHOT</version>
 		</dependency>
-		<!-- <dependency> <groupId>org.springframework</groupId> <artifactId>spring-context</artifactId> 
+		<!-- <dependency> <groupId>org.springframework</groupId> <artifactId>spring-context</artifactId>
 			<version>4.3.1.RELEASE</version> </dependency> -->
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
@@ -90,4 +85,49 @@
 			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
 	</dependencies>
+
+	<profiles>
+		<!--
+			Opt-in profile that adds Essbase Java API support: `mvn package -Pjapi`. Off by default so
+			a standard build/release never resolves or bundles Oracle's Essbase JARs (ess_japi,
+			ess_es_server, ojdl, pulled in transitively by essbase-utils/essbase-deps) - those aren't on
+			Maven Central and aren't ours to redistribute. Activating this profile adds src/japi/java
+			(EssbaseConnectionResolver, EssbaseEssGrid, EssbaseEssGridFactory, and the dormant Jaybase
+			mock) to the compile sourcepath and pulls in essbase-utils, which requires the real Oracle
+			JARs to already be installed in your local Maven repository.
+		-->
+		<profile>
+			<id>japi</id>
+			<dependencies>
+				<dependency>
+					<groupId>com.saxifrages.essbase</groupId>
+					<artifactId>essbase-utils</artifactId>
+					<version>1.2.2</version>
+				</dependency>
+			</dependencies>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.codehaus.mojo</groupId>
+						<artifactId>build-helper-maven-plugin</artifactId>
+						<version>3.6.0</version>
+						<executions>
+							<execution>
+								<id>add-japi-source</id>
+								<phase>generate-sources</phase>
+								<goals>
+									<goal>add-source</goal>
+								</goals>
+								<configuration>
+									<sources>
+										<source>src/japi/java</source>
+									</sources>
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 </project>
