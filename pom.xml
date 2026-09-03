@@ -4,8 +4,8 @@
 	<groupId>com.jasonwjones.essterm</groupId>
 	<artifactId>essterm</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Console Test</name>
-	<description>Testing out Lanterna</description>
+	<name>Essterm</name>
+	<description>Terminal-based Essbase ad hoc client</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
