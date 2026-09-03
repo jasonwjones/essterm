@@ -42,7 +42,7 @@ public class AdhocOptions {
 
 	private ZoomInPreference zoomInPreference = ZoomInPreference.NEXT_LEVEL;
 
-	private boolean includeSelection;
+	private boolean includeSelection = true;
 
 	private boolean withinSelectedGroup;
 

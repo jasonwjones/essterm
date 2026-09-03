@@ -41,6 +41,8 @@ public class AdhocOptionsDialogWindow extends DialogWindow {
 	public AdhocOptionsDialogWindow(AdhocOptions original, EnumSet<AdhocOptionCapability> supported) {
 		super("Ad hoc Options");
 
+		setCloseWindowWithEscape(true);
+
 		this.value = new AdhocOptions(original);
 
 		this.displayOptions = new DisplayOptionsPanel(value, supported);
