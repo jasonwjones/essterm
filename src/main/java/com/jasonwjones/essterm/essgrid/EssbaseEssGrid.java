@@ -99,6 +99,11 @@ class EssbaseEssGrid implements EssGrid {
 	}
 
 	@Override
+	public void resetToDefault() {
+		throw new UnsupportedOperationException("Resetting to the default view is only supported via the REST backend for now");
+	}
+
+	@Override
 	public void zoomIn(Point point) {
 		try {
 			IEssOpZoomIn zoomIn = cubeView.createIEssOpZoomIn();

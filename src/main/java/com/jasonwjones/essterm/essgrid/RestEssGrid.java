@@ -43,7 +43,7 @@ class RestEssGrid implements EssGrid {
 
 	private final EssCube cube;
 
-	private final EssCubeView cubeView;
+	private EssCubeView cubeView;
 
 	RestEssGrid(ChosenConnection connection, EssCube cube) {
 		this.connection = connection;
@@ -63,6 +63,16 @@ class RestEssGrid implements EssGrid {
 
 	@Override
 	public void retrieve() {
+		cubeView.refresh();
+	}
+
+	@Override
+	public void resetToDefault() {
+		// Mirrors the same reset+reopen+refresh the constructor does for a brand new grid: the REST
+		// API persists every operation into a hidden per-user layout, so simply re-opening isn't
+		// enough on its own - it would just pick back up wherever this view left off.
+		cube.resetDefaultView();
+		this.cubeView = cube.openCubeView();
 		cubeView.refresh();
 	}
 

@@ -24,7 +24,8 @@ public enum AdhocGridAction {
 	INCREASE_VISIBLE_COLUMNS("Increase visible columns", "increase-visible"),
 	EDIT_CELL("Edit cell", "edit-cell"),
 	MEMBER_SELECTION("Select members and place in grid", "member-selection"),
-	TOGGLE_KEY_BINDINGS_BAR("Toggle key bindings bar", "toggle-bindings");
+	TOGGLE_KEY_BINDINGS_BAR("Toggle key bindings bar", "toggle-bindings"),
+	RESET_GRID("Reset to a default retrieve", "reset-grid");
 
 	private String description;
 	

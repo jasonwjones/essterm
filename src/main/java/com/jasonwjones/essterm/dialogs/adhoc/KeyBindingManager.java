@@ -26,6 +26,7 @@ public class KeyBindingManager {
 		defaultBindings.put(charKey('?'), AdhocGridAction.KEY_BINDING_OPTIONS);
 		defaultBindings.put(charKey('m'), AdhocGridAction.MEMBER_SELECTION);
 		defaultBindings.put(charKey('k'), AdhocGridAction.TOGGLE_KEY_BINDINGS_BAR);
+		defaultBindings.put(charKey('r'), AdhocGridAction.RESET_GRID);
 
 		return defaultBindings;
 	}

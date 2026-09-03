@@ -16,6 +16,13 @@ public interface EssGrid {
 	public ChosenConnection getConnection();
 	
 	public void retrieve();
+
+	/**
+	 * Discards the current view and replaces it with a fresh default retrieve, as if a brand new
+	 * grid had just been opened. Useful for recovering from a zoom/pivot sequence that's left the
+	 * grid in a confusing shape.
+	 */
+	public void resetToDefault();
 	
 	/**
 	 * Zooms in on the point, using the current zoom settings

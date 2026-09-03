@@ -170,6 +170,13 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 			}
 		});
 
+		actionGridActionBinding.put(AdhocGridAction.RESET_GRID, new GridAction() {
+			@Override
+			public void execute(Point point, EssGrid dataSource) {
+				dataSource.resetToDefault();
+			}
+		});
+
 		actionGridActionBinding.put(AdhocGridAction.PIVOT, new GridAction() {
 			@Override
 			public void execute(Point point, EssGrid dataSource) {
