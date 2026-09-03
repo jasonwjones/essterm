@@ -6,17 +6,21 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.EnumMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.jasonwjones.essterm.grid.AdhocOptions;
+import com.jasonwjones.essterm.model.ChosenConnection;
 import com.jasonwjones.essterm.model.ChosenConnection.Backend;
 
 public class PropertyFileSettingsManager implements SettingsManager {
@@ -29,6 +33,15 @@ public class PropertyFileSettingsManager implements SettingsManager {
 	 * (pre-REST) plain server entries can still be read back as legacy JAPI entries.
 	 */
 	private Map<Backend, Set<String>> recentlyUsedServers;
+
+	private static final int MAX_RECENT_CONNECTIONS = 15;
+
+	/**
+	 * Fully-chosen connections (server, credentials, application, cube), most recent first, for the
+	 * "Recents" launcher menu. Persisted as {@code <BACKEND>|<server>|<username>|<password>|
+	 * <application>|<cube>} under keys distinct from {@link #recentlyUsedServers}'s.
+	 */
+	private List<ChosenConnection> recentConnections;
 
 	private String recentUsername;
 	
@@ -54,6 +67,7 @@ public class PropertyFileSettingsManager implements SettingsManager {
 		for (Backend backend : Backend.values()) {
 			recentlyUsedServers.put(backend, new TreeSet<>());
 		}
+		recentConnections = new ArrayList<>();
 	}
 
 	private final void loadSettings(File file) throws IOException {
@@ -63,7 +77,7 @@ public class PropertyFileSettingsManager implements SettingsManager {
 		}
 
 		properties.forEach((key, value) -> {
-			if (key.toString().startsWith("essterm.connections.recent")) {
+			if (key.toString().startsWith("essterm.connections.recent.")) {
 				String entry = value.toString();
 				Backend backend = Backend.JAPI;
 				String server = entry;
@@ -80,10 +94,64 @@ public class PropertyFileSettingsManager implements SettingsManager {
 				recentlyUsedServers.get(backend).add(server);
 			}
 		});
+
+		TreeMap<Integer, String> orderedRecentConnections = new TreeMap<>();
+		properties.forEach((key, value) -> {
+			String keyString = key.toString();
+			if (keyString.startsWith("essterm.connections.recentConnections.")) {
+				String indexString = keyString.substring("essterm.connections.recentConnections.".length());
+				try {
+					orderedRecentConnections.put(Integer.parseInt(indexString), value.toString());
+				} catch (NumberFormatException e) {
+					logger.warn("Ignoring malformed recent connection key: {}", keyString);
+				}
+			}
+		});
+		for (String entry : orderedRecentConnections.values()) {
+			ChosenConnection connection = parseRecentConnection(entry);
+			if (connection != null) {
+				recentConnections.add(connection);
+			}
+		}
+
 		recentUsername = properties.getProperty("essterm.connections.username");
 		recentPassword = properties.getProperty("essterm.connections.password");
 
 		logger.info("Loaded settings from {}", file);
+	}
+
+	private ChosenConnection parseRecentConnection(String entry) {
+		String[] parts = entry.split("\\|", -1);
+		if (parts.length != 6) {
+			logger.warn("Ignoring malformed recent connection entry: {}", entry);
+			return null;
+		}
+		try {
+			ChosenConnection connection = new ChosenConnection();
+			connection.setBackend(Backend.valueOf(parts[0]));
+			connection.setServer(parts[1]);
+			connection.setUsername(parts[2]);
+			connection.setPassword(parts[3]);
+			connection.setApplication(parts[4]);
+			connection.setCube(parts[5]);
+			return connection;
+		} catch (IllegalArgumentException e) {
+			logger.warn("Ignoring malformed recent connection entry: {}", entry);
+			return null;
+		}
+	}
+
+	private String formatRecentConnection(ChosenConnection connection) {
+		return String.join("|", connection.getBackend().toString(), connection.getServer(),
+				connection.getUsername(), connection.getPassword(), connection.getApplication(), connection.getCube());
+	}
+
+	private boolean sameConnection(ChosenConnection a, ChosenConnection b) {
+		return a.getBackend() == b.getBackend()
+				&& a.getServer().equals(b.getServer())
+				&& a.getUsername().equals(b.getUsername())
+				&& a.getApplication().equals(b.getApplication())
+				&& a.getCube().equals(b.getCube());
 	}
 
 	public void saveSettings() throws IOException {
@@ -102,6 +170,10 @@ public class PropertyFileSettingsManager implements SettingsManager {
 		properties.put("essterm.connections.username", recentUsername);
 		properties.put("essterm.connections.password", recentPassword);
 
+		for (int i = 0; i < recentConnections.size(); i++) {
+			properties.put("essterm.connections.recentConnections." + i, formatRecentConnection(recentConnections.get(i)));
+		}
+
 		try (Writer writer = new FileWriter(file)) {
 			properties.store(writer, "Properties updated at " + new Date());
 		}
@@ -116,7 +188,22 @@ public class PropertyFileSettingsManager implements SettingsManager {
 	public Set<String> getRecentlyUsedServers(Backend backend) {
 		return recentlyUsedServers.get(backend);
 	}
-	
+
+	@Override
+	public void addRecentConnection(ChosenConnection connection) {
+		recentConnections.removeIf(existing -> sameConnection(existing, connection));
+		recentConnections.add(0, connection);
+		while (recentConnections.size() > MAX_RECENT_CONNECTIONS) {
+			recentConnections.remove(recentConnections.size() - 1);
+		}
+	}
+
+	@Override
+	public List<ChosenConnection> getRecentConnections() {
+		return recentConnections;
+	}
+
+
 	@Override
 	public String getRecentUsername() {
 		return recentUsername;

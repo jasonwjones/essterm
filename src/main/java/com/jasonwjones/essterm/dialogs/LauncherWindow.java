@@ -35,6 +35,11 @@ public class LauncherWindow extends BasicWindow {
 		
 		ActionListBox actionBox = new ActionListBox()
 				.setLayoutData(LinearLayout.createLayoutData(Alignment.Fill))
+				.addItem("Recents", new Runnable() {
+					public void run() {
+						delegate.showRecentConnections();
+					}
+				})
 				.addItem("Connect to a cube", new Runnable() {
 					public void run() {
 						delegate.chooseConnection();
@@ -96,13 +101,15 @@ public class LauncherWindow extends BasicWindow {
 	}
 
 	public interface LauncherWindowDelegate {
-		
+
 		public void chooseConnection();
-		
+
 		public void startAdhocGrid();
-		
+
 		public void editAdhocOptions();
-		
+
+		public void showRecentConnections();
+
 	}
 
 }

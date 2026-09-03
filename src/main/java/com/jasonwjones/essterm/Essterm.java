@@ -16,6 +16,7 @@ import com.jasonwjones.essterm.dialogs.ConnectionDialogWindow;
 import com.jasonwjones.essterm.dialogs.ConnectionDialogWindow.ConnectionDialogModel;
 import com.jasonwjones.essterm.dialogs.LauncherWindow;
 import com.jasonwjones.essterm.dialogs.LauncherWindow.LauncherWindowDelegate;
+import com.jasonwjones.essterm.dialogs.RecentConnectionsWindow;
 import com.jasonwjones.essterm.dialogs.adhocoptions.AdhocOptionsDialogWindow;
 import com.jasonwjones.essterm.essbase.EssbaseConnectionResolver;
 import com.jasonwjones.essterm.essbase.RestConnectionResolver;
@@ -71,6 +72,38 @@ public class EssTerm implements LauncherWindowDelegate {
 		this.settingsManager.addRecentlyUsedServer(chosen.getBackend(), chosen.getServer());
 		this.settingsManager.setRecentUsername(chosen.getUsername());
 		this.settingsManager.setRecentPassword(chosen.getPassword());
+		// Escaping out of the dialog before picking an application/cube still returns a
+		// (mostly-empty) ChosenConnection - only a genuinely completed one belongs in "Recents".
+		if (chosen.getApplication() != null && chosen.getCube() != null) {
+			this.settingsManager.addRecentConnection(chosen);
+		}
+		saveSettings();
+	}
+
+	@Override
+	public void showRecentConnections() {
+		if (settingsManager.getRecentConnections().isEmpty()) {
+			new MessageDialogBuilder()
+					.setTitle("Recents")
+					.setText("No recent connections yet - use \"Connect to a cube\" first.")
+					.build().showDialog(gui);
+			return;
+		}
+
+		RecentConnectionsWindow window = new RecentConnectionsWindow(settingsManager.getRecentConnections(),
+				new RecentConnectionsWindow.RecentConnectionSelectionListener() {
+					@Override
+					public void onRecentConnectionSelected(ChosenConnection connection) {
+						connectionManager.setCurrentConnection(connection);
+						settingsManager.addRecentConnection(connection);
+						saveSettings();
+						startAdhocGrid();
+					}
+				});
+		window.showDialog(gui);
+	}
+
+	private void saveSettings() {
 		try {
 			this.settingsManager.saveSettings();
 		} catch (IOException e) {
