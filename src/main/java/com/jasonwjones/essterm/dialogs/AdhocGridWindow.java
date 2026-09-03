@@ -261,7 +261,17 @@ public class AdhocGridWindow extends BasicWindow implements KeyStrokeDelegate {
 		actionGridActionBinding.put(AdhocGridAction.ADHOC_OPTIONS, new GridAction() {
 			@Override
 			public void execute(Point point, EssGrid dataSource) {
-				new AdhocOptionsDialogWindow(options).showDialog(getTextGUI());
+				AdhocOptionsDialogWindow dialog = new AdhocOptionsDialogWindow(options, dataSource.getSupportedOptions());
+				dialog.showDialog(getTextGUI());
+				if (dialog.isSaved()) {
+					AdhocGridWindow.this.options = dialog.getValue();
+					try {
+						dataSource.updateCubeViewProperties(options);
+						dataSource.retrieve();
+					} catch (Exception e) {
+						logger.error("Error applying ad hoc options: {}", e.getMessage(), e);
+					}
+				}
 			}
 		});
 

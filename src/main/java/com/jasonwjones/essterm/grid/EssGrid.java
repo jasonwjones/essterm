@@ -54,6 +54,13 @@ public interface EssGrid {
 	public void updateCubeViewProperties(AdhocOptions adhocOptions) throws Exception;
 
 	/**
+	 * Which ad hoc options this connection can actually apply. Used to grey out (not hide) whatever
+	 * the current backend doesn't support, in a dialog that otherwise mirrors the full classic option
+	 * set. See {@link AdhocOptionCapability}.
+	 */
+	public EnumSet<AdhocOptionCapability> getSupportedOptions();
+
+	/**
 	 * The names of the dimensions on this grid's cube, for member selection.
 	 */
 	public List<String> getDimensionNames();

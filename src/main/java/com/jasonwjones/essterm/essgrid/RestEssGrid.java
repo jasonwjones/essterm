@@ -12,6 +12,7 @@ import com.appliedolap.essbase.EssCube;
 import com.appliedolap.essbase.EssCubeView;
 import com.appliedolap.essbase.EssDimension;
 import com.appliedolap.essbase.EssScript;
+import com.jasonwjones.essterm.grid.AdhocOptionCapability;
 import com.jasonwjones.essterm.grid.AdhocOptions;
 import com.jasonwjones.essterm.grid.EssCell;
 import com.jasonwjones.essterm.grid.EssGrid;
@@ -32,8 +33,10 @@ import com.jasonwjones.griddly.impl.BasicGrid;
  * <p>{@link #pivot} works structurally but has no confirmed-valid coordinate semantics yet (see
  * EssCubeView's own javadoc), so it may throw a live server error. {@link #setData} and
  * {@link #clearData} throw {@link UnsupportedOperationException}: essbase-rest-client has no cell
- * data-entry support at all yet. {@link #updateCubeViewProperties} is a no-op: display preferences
- * (aliases, indentation) aren't applied via the REST API yet either.
+ * data-entry support at all yet. {@link #updateCubeViewProperties} applies whatever
+ * {@link EssCubeView.GridPreferences} supports (see {@link #getSupportedOptions()} for exactly which
+ * fields) - aliases-on/off and alias table selection aren't among them: the REST wire format has no
+ * confirmed equivalent for either.
  */
 class RestEssGrid implements EssGrid {
 
@@ -83,11 +86,31 @@ class RestEssGrid implements EssGrid {
 
 	@Override
 	public void zoomIn(Point point, EnumSet<ZoomOptions> zoomOptions) throws Exception {
-		if (zoomOptions.contains(ZoomOptions.INCLUDE_SELECTION)) {
-			throw new UnsupportedOperationException(
-					"Zoom in with 'include selection' is not yet supported via the REST API");
+		if (!zoomOptions.contains(ZoomOptions.INCLUDE_SELECTION)) {
+			zoomIn(point);
+			return;
 		}
-		zoomIn(point);
+		// No per-call way to request this - "includeSelection" is a session-wide preference, not a
+		// parameter on the zoom action itself. Toggle it on just for this one call and restore
+		// whatever was there before, so a one-off "zoom in and keep the selection" doesn't leave the
+		// session-wide default changed underneath the user.
+		EssCubeView.GridPreferences before = cubeView.getPreferences();
+		if (!before.includeSelection()) {
+			cubeView.setPreferences(withIncludeSelection(before, true));
+		}
+		try {
+			zoomIn(point);
+		} finally {
+			if (!before.includeSelection()) {
+				cubeView.setPreferences(before);
+			}
+		}
+	}
+
+	private static EssCubeView.GridPreferences withIncludeSelection(EssCubeView.GridPreferences source, boolean includeSelection) {
+		return new EssCubeView.GridPreferences(source.indentation(), source.suppressMissingRows(),
+				source.suppressZeroRows(), source.suppressUnderscoreRows(), source.repeatMemberLabels(),
+				source.zoomInPreference(), includeSelection, source.withinSelectedGroup(), source.removeUnselectedGroup());
 	}
 
 	@Override
@@ -164,7 +187,52 @@ class RestEssGrid implements EssGrid {
 
 	@Override
 	public void updateCubeViewProperties(AdhocOptions adhocOptions) {
-		logger.debug("Ad hoc display options (aliases, indentation) are not yet applied via the REST API");
+		cubeView.setPreferences(new EssCubeView.GridPreferences(
+				toRestIndentation(adhocOptions.getIndentation()),
+				adhocOptions.isSuppressMissingRows(),
+				adhocOptions.isSuppressZeroRows(),
+				adhocOptions.isSuppressUnderscores(),
+				adhocOptions.isRepeatMemberLabels(),
+				toRestZoomInPreference(adhocOptions.getZoomInPreference()),
+				adhocOptions.isIncludeSelection(),
+				adhocOptions.isWithinSelectedGroup(),
+				adhocOptions.isRemoveUnselectedGroup()));
+	}
+
+	private static EssCubeView.Indentation toRestIndentation(AdhocOptions.Indentation indentation) {
+		return switch (indentation) {
+		case NONE -> EssCubeView.Indentation.NONE;
+		case TOTALS -> EssCubeView.Indentation.TOTALS;
+		case SUBITEMS -> EssCubeView.Indentation.SUBITEMS;
+		};
+	}
+
+	// AdhocOptions.ZoomInPreference has four more values than the REST wire format can express
+	// (SIBLING_LEVEL, SAME_LEVEL, SAME_GENERATION, FORMULAS are JAPI-only) - getSupportedOptions()
+	// keeps those out of reach in the dialog for this backend, so this is never actually asked to
+	// map one of them, but it needs a defined fallback rather than an incomplete switch.
+	private static EssCubeView.ZoomInPreference toRestZoomInPreference(AdhocOptions.ZoomInPreference preference) {
+		return switch (preference) {
+		case ALL_LEVELS -> EssCubeView.ZoomInPreference.ALL_LEVELS;
+		case BOTTOM_LEVEL -> EssCubeView.ZoomInPreference.BOTTOM_LEVEL;
+		default -> EssCubeView.ZoomInPreference.NEXT_LEVEL;
+		};
+	}
+
+	@Override
+	public EnumSet<AdhocOptionCapability> getSupportedOptions() {
+		return EnumSet.of(
+				AdhocOptionCapability.INDENTATION,
+				AdhocOptionCapability.SUPPRESS_MISSING_ROWS,
+				AdhocOptionCapability.SUPPRESS_ZERO_ROWS,
+				AdhocOptionCapability.SUPPRESS_UNDERSCORE_ROWS,
+				AdhocOptionCapability.REPEAT_MEMBER_LABELS,
+				AdhocOptionCapability.ZOOM_IN_NEXT_LEVEL,
+				AdhocOptionCapability.ZOOM_IN_ALL_LEVELS,
+				AdhocOptionCapability.ZOOM_IN_BOTTOM_LEVEL,
+				AdhocOptionCapability.INCLUDE_SELECTION,
+				AdhocOptionCapability.WITHIN_SELECTED_GROUP,
+				AdhocOptionCapability.REMOVE_UNSELECTED_GROUP);
 	}
 
 	@Override

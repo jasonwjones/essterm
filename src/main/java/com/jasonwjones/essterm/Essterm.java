@@ -1,6 +1,7 @@
 package com.jasonwjones.essterm;
 
 import java.io.IOException;
+import java.util.EnumSet;
 import java.util.Set;
 
 import org.slf4j.Logger;
@@ -22,6 +23,7 @@ import com.jasonwjones.essterm.essbase.EssbaseConnectionResolver;
 import com.jasonwjones.essterm.essbase.RestConnectionResolver;
 import com.jasonwjones.essterm.essgrid.EssbaseEssGridFactory;
 import com.jasonwjones.essterm.essgrid.RestEssGridFactory;
+import com.jasonwjones.essterm.grid.AdhocOptionCapability;
 import com.jasonwjones.essterm.grid.EssGrid;
 import com.jasonwjones.essterm.grid.EssGridFactory;
 import com.jasonwjones.essterm.model.ChosenConnection;
@@ -167,8 +169,16 @@ public class EssTerm implements LauncherWindowDelegate {
 
 	@Override
 	public void editAdhocOptions() {
-		AdhocOptionsDialogWindow optionsDialog = new AdhocOptionsDialogWindow(settingsManager.getAdhocOptions());
+		// No live connection yet at this menu entry point, so there's no backend to ask which
+		// options it supports - show everything as available. Whichever backend actually opens a
+		// grid later will just silently ignore whatever it doesn't support (see
+		// EssGrid#updateCubeViewProperties), the same as if these had been set post-connection.
+		AdhocOptionsDialogWindow optionsDialog = new AdhocOptionsDialogWindow(
+				settingsManager.getAdhocOptions(), EnumSet.allOf(AdhocOptionCapability.class));
 		optionsDialog.showDialog(gui);
+		if (optionsDialog.isSaved()) {
+			settingsManager.getAdhocOptions().applyFrom(optionsDialog.getValue());
+		}
 	}
 
 }

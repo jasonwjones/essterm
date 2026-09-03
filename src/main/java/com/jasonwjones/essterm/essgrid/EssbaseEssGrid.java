@@ -23,9 +23,11 @@ import com.essbase.api.dataquery.IEssOpRemoveOnly;
 import com.essbase.api.dataquery.IEssOpRetrieve;
 import com.essbase.api.dataquery.IEssOpUpdate;
 import com.essbase.api.dataquery.IEssOpZoomIn;
+import com.essbase.api.dataquery.IEssOpZoomIn.EEssZoomInPreference;
 import com.essbase.api.dataquery.IEssOpZoomOut;
 import com.essbase.api.datasource.IEssCube;
 import com.essbase.api.datasource.IEssOlapFileObject;
+import com.jasonwjones.essterm.grid.AdhocOptionCapability;
 import com.jasonwjones.essterm.grid.AdhocOptions;
 import com.jasonwjones.essterm.grid.EssCell;
 import com.jasonwjones.essterm.grid.EssGrid;
@@ -53,9 +55,11 @@ class EssbaseEssGrid implements EssGrid {
 	private ChosenConnection connection;
 	
 	public void updateCubeViewProperties(AdhocOptions adhocOptions) throws Exception {
-		// this.adhocOptions = adhocOptions;
-
 		cubeView.setAliasNames(adhocOptions.isUseAliases());
+		if (adhocOptions.getAliasTableName() != null) {
+			cubeView.setAliasTable(adhocOptions.getAliasTableName());
+		}
+		cubeView.setUseBothForRowDimensions(adhocOptions.isUseBothMemberNameAndAlias());
 
 		switch (adhocOptions.getIndentation()) {
 		case NONE:
@@ -70,7 +74,44 @@ class EssbaseEssGrid implements EssGrid {
 		default:
 			break;
 		}
+
+		cubeView.setSuppressMissing(adhocOptions.isSuppressMissingRows());
+		cubeView.setSuppressZero(adhocOptions.isSuppressZeroRows());
+		cubeView.setSuppressUnderscore(adhocOptions.isSuppressUnderscores());
+		cubeView.setRepeatMemberNames(adhocOptions.isRepeatMemberLabels());
+
+		cubeView.setIncludeSelection(adhocOptions.isIncludeSelection());
+		cubeView.setWithinSelectedGroup(adhocOptions.isWithinSelectedGroup());
+		cubeView.setSelectionOnly(adhocOptions.isRemoveUnselectedGroup());
+
+		cubeView.setDrillLevel(toDrillLevel(adhocOptions.getZoomInPreference()));
+
 		cubeView.updatePropertyValues();
+	}
+
+	private static EEssZoomInPreference toDrillLevel(AdhocOptions.ZoomInPreference preference) {
+		switch (preference) {
+		case ALL_LEVELS:
+			return EEssZoomInPreference.ALL_LEVELS;
+		case BOTTOM_LEVEL:
+			return EEssZoomInPreference.BOTTOM_LEVEL;
+		case SIBLING_LEVEL:
+			return EEssZoomInPreference.SIBLING_LEVEL;
+		case SAME_LEVEL:
+			return EEssZoomInPreference.SAME_LEVEL;
+		case SAME_GENERATION:
+			return EEssZoomInPreference.SAME_GENERATION;
+		case FORMULAS:
+			return EEssZoomInPreference.CALC_LEVEL;
+		case NEXT_LEVEL:
+		default:
+			return EEssZoomInPreference.NEXT_LEVEL;
+		}
+	}
+
+	@Override
+	public EnumSet<AdhocOptionCapability> getSupportedOptions() {
+		return EnumSet.allOf(AdhocOptionCapability.class);
 	}
 
 	public EssbaseEssGrid(ChosenConnection connection, IEssCube cube) throws EssGridException {
