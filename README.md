@@ -21,6 +21,31 @@ It talks to Essbase two ways: the modern REST API, or (optionally) the classic J
 These were captured with [VHS](https://github.com/charmbracelet/vhs) from the tape script in
 [`demo.tape`](demo.tape) - run `vhs demo.tape` after a build to regenerate them.
 
+## Quick start (no build required)
+
+Just want to try it out?
+
+1. Install Java 17 or newer if you don't already have it - [Eclipse Temurin](https://adoptium.net)
+   is a good free option.
+2. Download the latest `essterm-*.jar` from the
+   [Releases page](https://github.com/jasonwjones/essterm/releases).
+3. Open a terminal (Terminal on macOS, Command Prompt or PowerShell on Windows, your shell on
+   Linux) in the folder you downloaded it to, and run:
+   ```
+   java -jar essterm-1.0.0.jar
+   ```
+   Prefer a normal, resizable window instead of whatever your terminal happens to look like? Add
+   `-Dessterm.swing=true`:
+   ```
+   java -Dessterm.swing=true -jar essterm-1.0.0.jar
+   ```
+
+You'll need a real Essbase server to connect to - essterm is a client, not a sandbox - so have a
+REST API endpoint and credentials handy and use "Connect to a cube" (or "Recents" if you've
+connected before).
+
+Prefer to build from source, or want to contribute? See [Building](#building) below.
+
 ## A testbed for essbase-rest-client
 
 Essterm is also a deliberate testbed for
@@ -54,7 +79,7 @@ alongside this project.
   requires those JARs already installed in your local Maven repository. Without them, the Connect
   dialog simply greys out the Java API option and explains why.
 
-## Requirements
+## Requirements (building from source)
 
 - Java 17+
 - Maven
