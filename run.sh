@@ -32,4 +32,10 @@ if [[ "$build" -eq 1 ]]; then
 	mvn -q package
 fi
 
-exec java "${java_args[@]}" -jar target/essterm-0.0.1-SNAPSHOT.jar
+# Not "${java_args[@]}" directly: macOS ships bash 3.2 (the last GPLv2 release) as /bin/bash, and in
+# that version expanding an empty array under `set -u` throws "unbound variable" instead of nothing.
+if [[ ${#java_args[@]} -gt 0 ]]; then
+	exec java "${java_args[@]}" -jar target/essterm-0.0.1-SNAPSHOT.jar
+else
+	exec java -jar target/essterm-0.0.1-SNAPSHOT.jar
+fi
