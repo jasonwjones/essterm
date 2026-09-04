@@ -39,8 +39,8 @@ import com.jasonwjones.essterm.model.ChosenConnection;
 import com.jasonwjones.essterm.simplegrid.DoubleEssCell;
 import com.jasonwjones.essterm.simplegrid.MissingCell;
 import com.jasonwjones.essterm.simplegrid.SimpleEssCell;
-import com.jasonwjones.griddly.Grid;
-import com.jasonwjones.griddly.impl.BasicGrid;
+import com.jasonwjones.essterm.grid.BasicGrid;
+import com.jasonwjones.essterm.grid.Grid;
 import com.saxifrages.essbase.util.ConversionDelegate;
 import com.saxifrages.essbase.util.IteratorUtil;
 

@@ -5,7 +5,6 @@ import java.util.EnumSet;
 import java.util.List;
 
 import com.jasonwjones.essterm.model.ChosenConnection;
-import com.jasonwjones.griddly.Grid;
 
 public interface EssGrid {
 	
