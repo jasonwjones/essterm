@@ -7,6 +7,20 @@ locally, no Excel or browser required.
 It talks to Essbase two ways: the modern REST API, or (optionally) the classic Java API. See
 [Two backends](#two-backends) below.
 
+## Screenshots
+
+![Essterm demo: launcher, Recents, ad hoc navigation, member selection, and ad hoc options](docs/images/demo.gif)
+
+|  |  |
+|---|---|
+| ![Launcher menu](docs/images/launcher.png) | ![Ad hoc grid, zoomed into Product and Market](docs/images/adhoc-grid-zoomed.png) |
+| Launcher menu | Ad hoc grid, zoomed into two dimensions at once |
+| ![Member selection dialog](docs/images/member-selection.png) | ![Ad hoc options dialog](docs/images/adhoc-options.png) |
+| Member selection | Ad hoc options, mirroring the classic Display tab |
+
+These were captured with [VHS](https://github.com/charmbracelet/vhs) from the tape script in
+[`demo.tape`](demo.tape) - run `vhs demo.tape` after a build to regenerate them.
+
 ## A testbed for essbase-rest-client
 
 Essterm is also a deliberate testbed for

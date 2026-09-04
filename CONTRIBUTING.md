@@ -33,6 +33,15 @@ essterm can talk to Essbase two ways:
   essterm itself - check there first.
 - **JAPI**, via the real Essbase Java API - opt-in only, see `AGENTS.md` for how that's wired.
 
+## Updating the README's screenshots
+
+If your change visibly affects a screen shown in the README, regenerate the screenshots rather than
+leaving them stale: install [VHS](https://github.com/charmbracelet/vhs) (`brew install vhs`), build,
+and run `vhs demo.tape` from the repo root - it drives a real session via "Recents" (never the raw
+Connect dialog, so no password ever ends up on screen, even masked) and writes PNGs to
+`docs/images/`. Optimize them losslessly before committing, e.g. `oxipng -o max --strip safe
+docs/images/*.png`.
+
 ## Testing a change
 
 There's no unit test suite. Verification here means actually running the app - build it, launch it
