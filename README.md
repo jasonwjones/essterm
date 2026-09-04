@@ -11,12 +11,24 @@ It talks to Essbase two ways: the modern REST API, or (optionally) the classic J
 
 ![Essterm demo: launcher, Recents, ad hoc navigation, member selection, and ad hoc options](docs/images/demo.gif)
 
-|  |  |
-|---|---|
-| ![Launcher menu](docs/images/launcher.png) | ![Ad hoc grid, zoomed into Product and Market](docs/images/adhoc-grid-zoomed.png) |
-| Launcher menu | Ad hoc grid, zoomed into two dimensions at once |
-| ![Member selection dialog](docs/images/member-selection.png) | ![Ad hoc options dialog](docs/images/adhoc-options.png) |
-| Member selection | Ad hoc options, mirroring the classic Display tab |
+<table>
+<tr>
+<td><img src="docs/images/launcher.png" alt="Launcher menu"></td>
+<td><img src="docs/images/adhoc-grid-zoomed.png" alt="Ad hoc grid, zoomed into Product and Market"></td>
+</tr>
+<tr>
+<td>Launcher menu</td>
+<td>Ad hoc grid, zoomed into two dimensions at once</td>
+</tr>
+<tr>
+<td><img src="docs/images/member-selection.png" alt="Member selection dialog"></td>
+<td><img src="docs/images/adhoc-options.png" alt="Ad hoc options dialog"></td>
+</tr>
+<tr>
+<td>Member selection</td>
+<td>Ad hoc options, mirroring the classic Display tab</td>
+</tr>
+</table>
 
 These were captured with [VHS](https://github.com/charmbracelet/vhs) from the tape script in
 [`demo.tape`](demo.tape) - run `vhs demo.tape` after a build to regenerate them.
