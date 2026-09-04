@@ -14,13 +14,18 @@ Set Shell "bash"
 Set FontSize 16
 Set Width 1400
 Set Height 1150
-Set Theme "Dracula"
+# A plain black-background terminal (standard ANSI palette) instead of a named VHS theme -
+# named themes recolor the *unpainted terminal background* (visible around Lanterna's own
+# window) to whatever accent that theme picked, which read as an unexpected pink/blue cast.
+Set Theme '{"name": "Plain", "background": "#000000", "foreground": "#e5e5e5", "cursor": "#e5e5e5", "selectionBackground": "#5c5cff", "selectionForeground": "#000000", "black": "#000000", "red": "#cd0000", "green": "#00cd00", "yellow": "#cdcd00", "blue": "#0000ee", "purple": "#cd00cd", "cyan": "#00cdcd", "white": "#e5e5e5", "brightBlack": "#7f7f7f", "brightRed": "#ff0000", "brightGreen": "#00ff00", "brightYellow": "#ffff00", "brightBlue": "#5c5cff", "brightPurple": "#ff00ff", "brightCyan": "#00ffff", "brightWhite": "#ffffff"}'
 Set Padding 20
-Set TypingSpeed 60ms
+Set TypingSpeed 100ms
+Set PlaybackSpeed 0.6
 
-Type "java -jar target/essterm-0.0.1-SNAPSHOT.jar"
+Type "java -jar target/essterm-1.0.0.jar"
 Enter
 Wait+Screen@30s /Essterm/
+Sleep 500ms
 
 Screenshot docs/images/launcher.png
 

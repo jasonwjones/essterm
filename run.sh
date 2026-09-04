@@ -32,10 +32,18 @@ if [[ "$build" -eq 1 ]]; then
 	mvn -q package
 fi
 
+# Discovered rather than hardcoded so this doesn't need editing on every version bump.
+jar_files=(target/essterm-*.jar)
+if [[ ${#jar_files[@]} -ne 1 ]]; then
+	echo "Expected exactly one target/essterm-*.jar, found ${#jar_files[@]} - build first?" >&2
+	exit 1
+fi
+jar="${jar_files[0]}"
+
 # Not "${java_args[@]}" directly: macOS ships bash 3.2 (the last GPLv2 release) as /bin/bash, and in
 # that version expanding an empty array under `set -u` throws "unbound variable" instead of nothing.
 if [[ ${#java_args[@]} -gt 0 ]]; then
-	exec java "${java_args[@]}" -jar target/essterm-0.0.1-SNAPSHOT.jar
+	exec java "${java_args[@]}" -jar "$jar"
 else
-	exec java -jar target/essterm-0.0.1-SNAPSHOT.jar
+	exec java -jar "$jar"
 fi

@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.jasonwjones.essterm</groupId>
 	<artifactId>essterm</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>Essterm</name>
 	<description>Terminal-based Essbase ad hoc client</description>
 

@@ -63,7 +63,7 @@ echo them.
 Two proven ways to verify a change actually works, in order of preference:
 
 1. **Drive the real UI.** Build, then run essterm under `tmux` (`tmux new-session -d -s essterm -x
-   140 -y 45 'java -jar target/essterm-0.0.1-SNAPSHOT.jar'`), send keys with `tmux send-keys`, and
+   140 -y 45 'java -jar target/essterm-1.0.0.jar'`), send keys with `tmux send-keys`, and
    read the screen with `tmux capture-pane -p`. This is the only way to catch UI-layer bugs (the
    constructor-shadowing bug above was invisible from raw REST testing - it only showed up by
    actually opening the dialog twice in the running app).
