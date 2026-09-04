@@ -35,7 +35,14 @@ public class EssTermConfig {
 	
 	@Bean
 	public WindowBasedTextGUI getTextGUI() throws IOException {
-	    Terminal terminal = new DefaultTerminalFactory().createTerminal();
+	    DefaultTerminalFactory factory = new DefaultTerminalFactory();
+	    // Lanterna already auto-falls-back to a Swing window when it can't detect a real TTY (e.g.
+	    // running inside an IDE) - this just lets that same Swing terminal be forced on demand, even
+	    // from a genuine terminal, for local testing. See run.sh's --swing flag.
+	    if (Boolean.getBoolean("essterm.swing")) {
+	        factory.setPreferTerminalEmulator(true);
+	    }
+	    Terminal terminal = factory.createTerminal();
 	    Screen screen = new TerminalScreen(terminal);
 	    screen.startScreen();
 	    return new MultiWindowTextGUI(screen, new DefaultWindowManager(), new EmptySpace(TextColor.ANSI.BLUE));
